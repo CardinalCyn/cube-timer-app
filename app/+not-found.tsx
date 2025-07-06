@@ -1,14 +1,17 @@
+import { TextCustomFont } from "@/components/TextCustomFont";
 import { Link, Stack } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 export default function NotFoundScreen() {
   return (
     <>
       <Stack.Screen options={{ title: "Oops!" }} />
       <View style={styles.container}>
-        <Text style={styles.title}>This screen does not exist.</Text>
-        <Link href="/(drawer)/index" style={styles.link}>
-          <Text style={styles.linkText}>Go to home screen!</Text>
+        <TextCustomFont style={styles.title}>
+          This screen does not exist.
+        </TextCustomFont>
+        <Link href="/(drawer)/(standard)/index" style={styles.link}>
+          <TextCustomFont>Go to home screen!</TextCustomFont>
         </Link>
       </View>
     </>
@@ -29,9 +32,5 @@ const styles = StyleSheet.create({
   link: {
     marginTop: 15,
     paddingVertical: 15,
-  },
-  linkText: {
-    fontSize: 14,
-    color: "#2e78b7",
   },
 });

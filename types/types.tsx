@@ -16,3 +16,13 @@ export type TimerSolvesData = {
   Ao50: string | null;
   Ao100: string | null;
 };
+
+export type PenaltyState = "noPenalty" | "+2" | "DNF";
+
+export type SampleSolveData = {
+  id: number;
+  scramble: string;
+  solveTime: number | "DNF";
+  date: Date;
+  penaltyState: PenaltyState;
+};

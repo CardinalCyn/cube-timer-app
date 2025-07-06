@@ -1,9 +1,9 @@
-import { StyleSheet, Text, View } from "react-native";
-
+import { TextCustomFont } from "@/components/TextCustomFont";
+import { StyleSheet, View } from "react-native";
 export default function PracticePage() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Settings</Text>
+      <TextCustomFont>Settings</TextCustomFont>
     </View>
   );
 }

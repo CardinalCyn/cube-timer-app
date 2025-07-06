@@ -1,6 +1,7 @@
 import { formatTime } from "@/constants/utils";
 import { useTheme } from "@/hooks/useTheme";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { TextCustomFont } from "./TextCustomFont";
 type TimerProps = {
   elapsedTime: number;
 };
@@ -9,9 +10,9 @@ export default function Timer({ elapsedTime }: TimerProps) {
   const { colors } = useTheme();
   return (
     <View style={styles.container}>
-      <Text style={[styles.text, { color: colors.text }]}>
-        {formatTime(elapsedTime)}
-      </Text>
+      <TextCustomFont style={[styles.text, { color: colors.text }]}>
+        {formatTime(elapsedTime, ":")}
+      </TextCustomFont>
     </View>
   );
 }

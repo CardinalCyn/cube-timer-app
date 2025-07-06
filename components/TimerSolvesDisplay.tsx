@@ -1,6 +1,7 @@
 import { useTheme } from "@/hooks/useTheme";
 import { TimerSolvesData } from "@/types/types";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { TextCustomFont } from "./TextCustomFont";
 
 export default function TimerSolveDisplay({
   timerSolvesData,
@@ -16,14 +17,14 @@ export default function TimerSolveDisplay({
   const renderColumn = (keys: string[]) => (
     <View>
       {keys.map((key) => (
-        <Text key={key} style={[styles.text, { color: colors.text }]}>
+        <TextCustomFont key={key} style={[styles.text, { color: colors.text }]}>
           {key[0].toUpperCase() +
             key.slice(1) +
             ": " +
             (timerSolvesData[key as keyof typeof timerSolvesData]
               ? timerSolvesData[key as keyof typeof timerSolvesData]
               : "--")}
-        </Text>
+        </TextCustomFont>
       ))}
     </View>
   );

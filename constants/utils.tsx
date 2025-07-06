@@ -1,4 +1,7 @@
-export function formatTime(elapsedTime: number): string {
+export function formatTime(
+  elapsedTime: number,
+  millisecondsFormat: "." | ":",
+): string {
   const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
   const minutes = Math.floor((elapsedTime / (1000 * 60)) % 60);
   const seconds = Math.floor((elapsedTime / 1000) % 60);
@@ -10,8 +13,8 @@ export function formatTime(elapsedTime: number): string {
   const stringifiedMilliseconds = String(milliseconds).padStart(2, "0");
 
   return hours
-    ? `${stringifiedHours}:${stringifiedMinutes}:${stringifiedSeconds}:${stringifiedMilliseconds}`
+    ? `${stringifiedHours}:${stringifiedMinutes}:${stringifiedSeconds}${millisecondsFormat}${stringifiedMilliseconds}`
     : minutes
-    ? `${stringifiedMinutes}:${stringifiedSeconds}:${stringifiedMilliseconds}`
-    : `${stringifiedSeconds}:${stringifiedMilliseconds}`;
+    ? `${stringifiedMinutes}:${stringifiedSeconds}${millisecondsFormat}${stringifiedMilliseconds}`
+    : `${stringifiedSeconds}${millisecondsFormat}${stringifiedMilliseconds}`;
 }
