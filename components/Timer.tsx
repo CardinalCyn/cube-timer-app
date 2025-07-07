@@ -11,7 +11,7 @@ export default function Timer({ elapsedTime }: TimerProps) {
   return (
     <View style={styles.container}>
       <TextCustomFont style={[styles.text, { color: colors.text }]}>
-        {formatTime(elapsedTime, ":")}
+        {formatTime(elapsedTime, ":", true)}
       </TextCustomFont>
     </View>
   );

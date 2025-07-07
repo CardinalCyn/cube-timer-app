@@ -1,6 +1,7 @@
 export function formatTime(
   elapsedTime: number,
   millisecondsFormat: "." | ":",
+  padStart: boolean,
 ): string {
   const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
   const minutes = Math.floor((elapsedTime / (1000 * 60)) % 60);
@@ -13,8 +14,14 @@ export function formatTime(
   const stringifiedMilliseconds = String(milliseconds).padStart(2, "0");
 
   return hours
-    ? `${stringifiedHours}:${stringifiedMinutes}:${stringifiedSeconds}${millisecondsFormat}${stringifiedMilliseconds}`
+    ? `${
+        padStart ? stringifiedHours : String(hours)
+      }:${stringifiedMinutes}:${stringifiedSeconds}${millisecondsFormat}${stringifiedMilliseconds}`
     : minutes
-    ? `${stringifiedMinutes}:${stringifiedSeconds}${millisecondsFormat}${stringifiedMilliseconds}`
-    : `${stringifiedSeconds}${millisecondsFormat}${stringifiedMilliseconds}`;
+    ? `${
+        padStart ? stringifiedMinutes : String(minutes)
+      }:${stringifiedSeconds}${millisecondsFormat}${stringifiedMilliseconds}`
+    : `${
+        padStart ? String(seconds).padStart(1, "0") : String(seconds)
+      }${millisecondsFormat}${stringifiedMilliseconds}`;
 }

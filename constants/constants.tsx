@@ -35,6 +35,15 @@ export const allTabs = [
       ),
     },
   },
+  {
+    name: "analytics",
+    options: {
+      title: "",
+      tabBarIcon: ({ color, size }: { color: string; size: number }) => (
+        <MaterialIcons name="analytics" size={size} color={color} />
+      ),
+    },
+  },
 ];
 
 export const themes: {
@@ -64,7 +73,18 @@ export const themes: {
     card: "#1C1C1E",
   },
 };
+const sampleAnalyticsData: SampleSolveData[] = [];
+for (let i = 0; i < 400; i++) {
+  sampleAnalyticsData.push({
+    id: i,
+    solveTime: Math.floor(Math.random() * (20000 - 1000 + 1) + 1000),
+    date: new Date("2024-01-15T10:30:00"),
+    penaltyState: "noPenalty",
+    scramble: "R U R' U' R U R' F' R U R' U' R' F R",
+  });
+}
 
+export { sampleAnalyticsData };
 export const sampleSolveData: SampleSolveData[] = [
   {
     id: 1,

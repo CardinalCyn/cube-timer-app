@@ -1,28 +1,44 @@
+import SolveDetailModal from "@/components/SolveDetailModal";
 import { TextCustomFont } from "@/components/TextCustomFont";
 import { sampleSolveData } from "@/constants/constants";
 import { formatTime } from "@/constants/utils";
 import { useTheme } from "@/hooks/useTheme";
 import { SampleSolveData } from "@/types/types";
+import React, { useState } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 
 export default function StandardHistory() {
   const { colors } = useTheme();
+  const [selectedSolve, setSelectedSolve] = useState<SampleSolveData | null>(
+    null,
+  );
+  const [modalVisible, setModalVisible] = useState(false);
+
   const numColumns = 3;
-  const placeHolderedData: (SampleSolveData | null)[] = sampleSolveData;
+  const placeHolderedData: (SampleSolveData | null)[] = [...sampleSolveData];
   while (placeHolderedData.length % numColumns) placeHolderedData.push(null);
+
+  const handleSolvePress = (solve: SampleSolveData) => {
+    setSelectedSolve(solve);
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setSelectedSolve(null);
+  };
+
   const renderSolveItem = ({ item }: { item: SampleSolveData | null }) => {
     if (item === null) return <View style={styles.pressableContainer} />;
     return (
       <Pressable
         style={[styles.pressableContainer, { backgroundColor: colors.card }]}
-        onPress={() => {
-          // Handle press - maybe show solve details
-        }}
+        onPress={() => handleSolvePress(item)}
       >
         <TextCustomFont style={[styles.solveTime]}>
           {item.solveTime === "DNF"
             ? item.solveTime
-            : formatTime(item.solveTime, ".")}
+            : formatTime(item.solveTime, ".", false)}
         </TextCustomFont>
         {item.date && (
           <TextCustomFont style={[styles.date]}>
@@ -43,6 +59,12 @@ export default function StandardHistory() {
         columnWrapperStyle={styles.row}
         showsVerticalScrollIndicator={false}
       />
+
+      <SolveDetailModal
+        visible={modalVisible}
+        onClose={handleCloseModal}
+        solveData={selectedSolve}
+      />
     </View>
   );
 }
@@ -61,17 +83,9 @@ const styles = StyleSheet.create({
   },
   pressableContainer: {
     flex: 1,
-    padding: 16,
     borderRadius: 12,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
     elevation: 3,
-    minHeight: 100,
+    minHeight: 150,
     justifyContent: "center",
     marginLeft: 8,
     marginRight: 8,
@@ -82,7 +96,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   date: {
-    fontSize: 10,
+    fontSize: 14,
     textAlign: "center",
     opacity: 0.5,
   },
