@@ -7,7 +7,7 @@ import { SampleSolveData } from "@/types/types";
 import React, { useState } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 
-export default function StandardHistory() {
+export default function PracticeHistory() {
   const { colors } = useTheme();
   const [selectedSolve, setSelectedSolve] = useState<SampleSolveData | null>(
     null,

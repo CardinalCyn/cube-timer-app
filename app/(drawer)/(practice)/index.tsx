@@ -5,7 +5,7 @@ import { TimerSolvesData } from "@/types/types";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
-export default function StandardTimer() {
+export default function PracticeTimer() {
   const { colors } = useTheme();
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);

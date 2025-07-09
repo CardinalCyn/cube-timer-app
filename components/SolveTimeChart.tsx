@@ -1,85 +1,55 @@
 import { SampleSolveData } from "@/types/types";
+import { useFont } from "@shopify/react-native-skia";
 import React from "react";
-import { Dimensions, Text, View } from "react-native";
-import { LineChart } from "react-native-chart-kit";
+import { View } from "react-native";
+import { CartesianChart, Scatter } from "victory-native";
 
 export default function SolveTimeChart({
   solveData,
+  width,
+  height,
 }: {
   solveData: SampleSolveData[];
+  width: number;
+  height: number;
 }) {
-  // Filter out DNF and prepare data for chart
-  const processChartData = (data: SampleSolveData[]) => {
-    const validSolves = data.filter(
-      (solve) =>
-        solve.solveTime !== "DNF" && typeof solve.solveTime === "number",
-    );
-    //ascending sort
-    const sortedSolves = validSolves.sort((a, b) => {
-      return a.date < b.date ? 1 : -1;
-    });
+  const A = 3000; // initial value
+  const k = 0.02; // decay rate
+  const noiseStrength = 10; // adjust randomness amplitude
 
-    const labelInterval = Math.ceil(sortedSolves.length / 10);
-    const labels = sortedSolves.map((_, index) =>
-      index % labelInterval === labelInterval - 1 ? `${index + 1}` : "",
-    );
-
+  const DATA = Array.from({ length: 3000 }, (_, i) => {
+    const base = A * Math.exp(-k * i);
+    const noise = (Math.random() - 0.5) * noiseStrength;
+    const highTmp = Math.max(0, base + noise); // keep values >= 0
     return {
-      labels: [...labels],
-      datasets: [
-        {
-          data: [
-            ...sortedSolves.map((solve) => (solve.solveTime as number) / 1000),
-          ], // Convert to seconds
-          color: (opacity = 1) => `rgba(81, 150, 244, ${opacity})`, // Blue line
-          strokeWidth: 2,
-        },
-      ],
+      day: i,
+      highTmp,
     };
-  };
+  });
 
-  const chartData = processChartData(solveData);
+  const xMax = DATA.length;
+  const yMax = Math.max(...DATA.map((point) => point.highTmp));
+  const font = useFont(require("../assets/fonts/SpaceMono-Regular.ttf"));
 
   return (
-    <View>
-      {/* Chart */}
-      <LineChart
-        data={chartData}
-        width={Dimensions.get("window").width - 60} // from react-native
-        height={220}
-        yAxisSuffix="s"
-        chartConfig={{
-          backgroundColor: "#e26a00",
-          backgroundGradientFrom: "#fb8c00",
-          backgroundGradientTo: "#ffa726",
-          decimalPlaces: 2,
-          color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-          labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-          style: {
-            borderRadius: 16,
-          },
-          propsForDots: {
-            r: "6",
-            strokeWidth: "2",
-            stroke: "#ffa726",
-          },
-        }}
-        bezier
-        style={{
-          marginVertical: 8,
-          borderRadius: 16,
-        }}
-      />
-
-      {/* Chart Labels */}
-      <View style={{ alignItems: "center", marginTop: 10 }}>
-        <Text style={{ fontSize: 14, fontWeight: "bold", color: "#333" }}>
-          Solve Progression
-        </Text>
-        <Text style={{ fontSize: 12, color: "#666" }}>
-          Solve Number (X) vs Time in Seconds (Y)
-        </Text>
-      </View>
+    <View style={{ width, height, marginHorizontal: "auto" }}>
+      <CartesianChart
+        data={DATA}
+        xKey="day"
+        yKeys={["highTmp"]}
+        axisOptions={{ font }}
+        domain={{ x: [0, xMax], y: [0, yMax + 20] }}
+      >
+        {({ points }) => (
+          //👇 pass a PointsArray to the Scatter component
+          <Scatter
+            points={points.highTmp}
+            radius={10}
+            style="fill"
+            color="red"
+          />
+        )}
+      </CartesianChart>
     </View>
   );
 }
