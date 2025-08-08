@@ -1,7 +1,10 @@
 import { TextCustomFont } from "@/components/TextCustomFont";
-import { formatTime } from "@/constants/utils";
+import {
+  calculatePenaltySolveTime,
+  convertCubingTime,
+} from "@/constants/utils";
 import { useTheme } from "@/hooks/useTheme";
-import { SampleSolveData } from "@/types/types";
+import { SolveData } from "@/types/types";
 import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { Modal, Pressable, StyleSheet, View } from "react-native";
@@ -9,7 +12,7 @@ import { Modal, Pressable, StyleSheet, View } from "react-native";
 interface SolveDetailModalProps {
   visible: boolean;
   onClose: () => void;
-  solveData: SampleSolveData | null;
+  solveData: SolveData | null;
 }
 
 export default function SolveDetailModal({
@@ -36,12 +39,13 @@ export default function SolveDetailModal({
 
   const formattedDate = formatDate(solveData.date);
   const timeDisplay =
-    solveData.solveTime === "DNF" || solveData.penaltyState === "DNF"
+    solveData.penaltyState === "DNF"
       ? "DNF"
-      : formatTime(
-          solveData.solveTime + solveData.penaltyState === "+2" ? 2000 : 0,
+      : convertCubingTime(
+          calculatePenaltySolveTime(solveData),
           ".",
           false,
+          true,
         );
 
   return (
@@ -62,27 +66,21 @@ export default function SolveDetailModal({
               >
                 {timeDisplay}
               </TextCustomFont>
+              <TextCustomFont style={[{ color: "red" }]}>
+                {solveData.penaltyState === "+2" && solveData.penaltyState}
+              </TextCustomFont>
             </View>
-
             <View style={styles.topRowItem}>
-              <MaterialIcons name="flag" size={20} color={colors.text} />
-              <TextCustomFont
-                style={[styles.topRowText, { color: colors.text }]}
-              >
-                {solveData.penaltyState}
+              <TextCustomFont style={[{ color: colors.text }]}>
+                {formattedDate}
               </TextCustomFont>
             </View>
           </View>
 
-          {/* Date */}
-          <TextCustomFont style={[styles.dateText, { color: colors.text }]}>
-            {formattedDate}
-          </TextCustomFont>
-
           {/* Scramble */}
           {solveData.scramble && (
             <View style={styles.scrambleContainer}>
-              <MaterialIcons name="shuffle" size={20} color={colors.text} />
+              <MaterialIcons name="cached" size={20} color={colors.text} />
               <TextCustomFont
                 style={[styles.scrambleText, { color: colors.text }]}
               >
@@ -94,16 +92,25 @@ export default function SolveDetailModal({
           {/* Final Row (Actions) */}
           <View style={styles.buttonContainer}>
             <Pressable
-              style={[styles.actionButton, { backgroundColor: "red" }]}
               onPress={() => {
-                console.log("Delete solve:", solveData.id);
                 onClose();
               }}
             >
               <MaterialIcons name="delete" size={20} color="white" />
-              <TextCustomFont style={styles.buttonText}>
-                Delete Solve
-              </TextCustomFont>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                onClose();
+              }}
+            >
+              <MaterialIcons name="flag" size={20} color={colors.text} />
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                onClose();
+              }}
+            >
+              <MaterialIcons name="book" size={20} color="white" />
             </Pressable>
           </View>
         </View>
@@ -115,7 +122,7 @@ export default function SolveDetailModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
@@ -159,12 +166,13 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     gap: 12,
+    flexDirection: "row",
   },
   actionButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    padding: 16,
+    padding: 8,
     borderRadius: 12,
     gap: 8,
   },

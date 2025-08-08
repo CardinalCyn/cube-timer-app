@@ -6,3 +6,5 @@ saving times
 graphing/ data analysis
 settings page
 dark mode
+
+npm run start to start

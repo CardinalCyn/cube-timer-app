@@ -1,4 +1,4 @@
-import { AllScreens, SampleSolveData } from "@/types/types";
+import { AllScreens, ChartSeries, SolveData } from "@/types/types";
 import { MaterialIcons } from "@expo/vector-icons";
 
 export const allScreens: AllScreens[] = [
@@ -73,45 +73,147 @@ export const themes: {
     card: "#1C1C1E",
   },
 };
-const sampleAnalyticsData: SampleSolveData[] = [];
-for (let i = 0; i < 400; i++) {
-  sampleAnalyticsData.push({
-    id: i,
-    solveTime: Math.floor(Math.random() * (20000 - 1000 + 1) + 1000),
-    date: new Date("2024-01-15T10:30:00"),
-    penaltyState: "noPenalty",
-    scramble: "R U R' U' R U R' F' R U R' U' R' F R",
-  });
-}
 
-export { sampleAnalyticsData };
-export const sampleSolveData: SampleSolveData[] = [
+export const DNF_VALUE = Number.MAX_SAFE_INTEGER;
+export const UNKNOWN = -666;
+
+export const sampleSolveData: SolveData[] = [
   {
     id: 1,
-    solveTime: 12340,
+    solveTime: 4190,
     scramble: "R U R' U' R U R' F' R U R' U' R' F R",
     date: new Date("2024-01-15T10:30:00"),
-    penaltyState: "noPenalty",
+    penaltyState: "+2",
+    session: 1,
   },
   {
     id: 2,
-    solveTime: 128211,
-    scramble: "L' D' B' R' D2 F' D F L' B2 U B2 U2 D F2 D R2 F2 U' L2",
-    date: new Date("2024-01-19T10:30:00"),
-    penaltyState: "+2",
+    solveTime: 6270,
+    scramble: "R U R' U' R U R' F' R U R' U' R' F R",
+    date: new Date("2024-01-15T10:30:00"),
+    penaltyState: "noPenalty",
+    session: 1,
   },
   {
     id: 3,
-    solveTime: "DNF",
+    solveTime: 7810,
     scramble: "R U R' U' R U R' F' R U R' U' R' F R",
-    date: new Date("2024-01-15T10:32:00"),
-    penaltyState: "DNF",
+    date: new Date("2024-01-15T10:30:00"),
+    penaltyState: "noPenalty",
+    session: 1,
   },
   {
-    id: 2,
-    solveTime: 1234134,
-    scramble: "L' D' B' R' D2 F' D F L' B2 U B2 U2 D F2 D R2 F2 U' L2",
-    date: new Date("2024-01-19T10:31:00"),
+    id: 4,
+    solveTime: 62270,
+    scramble: "R U R' U' R U R' F' R U R' U' R' F R",
+    date: new Date("2024-01-15T10:30:00"),
     penaltyState: "noPenalty",
+    session: 1,
+  },
+  {
+    id: 5,
+    solveTime: 16150,
+    scramble: "R U R' U' R U R' F' R U R' U' R' F R",
+    date: new Date("2024-01-15T10:30:00"),
+    penaltyState: "noPenalty",
+    session: 1,
+  },
+  {
+    id: 6,
+    solveTime: 18200,
+    scramble: "R U R' U' R U R' F' R U R' U' R' F R",
+    date: new Date("2024-01-15T10:30:00"),
+    penaltyState: "noPenalty",
+    session: 1,
+  },
+  {
+    id: 7,
+    solveTime: DNF_VALUE,
+    scramble: "R U R' U' R U R' F' R U R' U' R' F R",
+    date: new Date("2024-01-15T10:30:00"),
+    penaltyState: "noPenalty",
+    session: 1,
+  },
+  {
+    id: 8,
+    solveTime: DNF_VALUE,
+    scramble: "R U R' U' R U R' F' R U R' U' R' F R",
+    date: new Date("2024-01-15T10:30:00"),
+    penaltyState: "noPenalty",
+    session: 1,
+  },
+  {
+    id: 9,
+    solveTime: 750,
+    scramble: "R U R' U' R U R' F' R U R' U' R' F R",
+    date: new Date("2024-01-15T10:30:00"),
+    penaltyState: "noPenalty",
+    session: 1,
+  },
+  {
+    id: 10,
+    solveTime: 1090,
+    scramble: "R U R' U' R U R' F' R U R' U' R' F R",
+    date: new Date("2024-01-15T10:30:00"),
+    penaltyState: "noPenalty",
+    session: 1,
+  },
+  {
+    id: 11,
+    solveTime: 3010,
+    scramble: "R U R' U' R U R' F' R U R' U' R' F R",
+    date: new Date("2024-01-15T10:30:00"),
+    penaltyState: "noPenalty",
+    session: 1,
+  },
+  {
+    id: 12,
+    solveTime: 4090,
+    scramble: "R U R' U' R U R' F' R U R' U' R' F R",
+    date: new Date("2024-01-15T10:30:00"),
+    penaltyState: "noPenalty",
+    session: 1,
+  },
+];
+//how much time is added with a +2
+export const penaltySolveTime = 2000;
+//FIXME: need to have currentSession come from somewhere not here lol
+export const currentSessionIndex = 1;
+export const trimPercentage = 5;
+
+export const chartToolTipLabels: { label: string; textColor: string }[] = [
+  { label: "Solve Number", textColor: "" },
+  { label: "Solve Time", textColor: "red" },
+  { label: "PB", textColor: "yellow" },
+];
+
+export const chartSeries: ChartSeries[] = [
+  {
+    title: "Time",
+    property: "time",
+    color: "white",
+    connectMissingData: true,
+    graphDisplay: "line",
+  },
+  {
+    title: "Ao5",
+    property: "ao5",
+    color: "red",
+    connectMissingData: true,
+    graphDisplay: "line",
+  },
+  {
+    title: "Ao12",
+    property: "ao12",
+    color: "green",
+    connectMissingData: true,
+    graphDisplay: "line",
+  },
+  {
+    title: "Personal Best",
+    property: "personalBest",
+    color: "yellow",
+    connectMissingData: true,
+    graphDisplay: "both",
   },
 ];

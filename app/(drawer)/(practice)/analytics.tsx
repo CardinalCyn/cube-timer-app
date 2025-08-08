@@ -1,17 +1,23 @@
-import SolveTimeChart from "@/components/SolveTimeChart";
-import { sampleAnalyticsData } from "@/constants/constants";
-import { Dimensions, View } from "react-native";
+import SolveTimeChart from "@/components/chart/SolveTimeChart";
+import {
+  chartSeries,
+  currentSessionIndex,
+  sampleSolveData,
+  trimPercentage,
+} from "@/constants/constants";
+import { useTheme } from "@/hooks/useTheme";
+import { View } from "react-native";
 
 export default function PracticeAnalytics() {
-  const windowWidth = Dimensions.get("window").width;
-  const windowHeight = Dimensions.get("window").height;
+  const { colors } = useTheme();
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <SolveTimeChart
-        solveData={sampleAnalyticsData}
-        width={windowWidth - 50}
-        height={windowHeight / 3}
+        solveData={sampleSolveData}
+        chartSeries={chartSeries}
+        currentSession={currentSessionIndex}
+        trimPercentage={trimPercentage}
       />
     </View>
   );

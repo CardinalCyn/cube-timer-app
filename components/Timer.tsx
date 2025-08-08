@@ -1,4 +1,4 @@
-import { formatTime } from "@/constants/utils";
+import { convertCubingTime } from "@/constants/utils";
 import { useTheme } from "@/hooks/useTheme";
 import { StyleSheet, View } from "react-native";
 import { TextCustomFont } from "./TextCustomFont";
@@ -11,7 +11,7 @@ export default function Timer({ elapsedTime }: TimerProps) {
   return (
     <View style={styles.container}>
       <TextCustomFont style={[styles.text, { color: colors.text }]}>
-        {formatTime(elapsedTime, ":", true)}
+        {convertCubingTime(elapsedTime, ".", true, true)}
       </TextCustomFont>
     </View>
   );
