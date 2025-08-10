@@ -1,5 +1,5 @@
 import { SolveData } from "@/types/types";
-import { DNF_VALUE, penaltySolveTime } from "./constants";
+import { DNF_VALUE, penaltySolveTime, UNKNOWN } from "./constants";
 
 export function convertCubingTime(
   elapsedTime: number,
@@ -40,4 +40,29 @@ export function calculatePenaltySolveTime(solve: SolveData): number {
     : solve.penaltyState === "+2"
     ? solve.solveTime + penaltySolveTime
     : solve.solveTime;
+}
+
+const statsToTimeFormat = [
+  "ao3",
+  "ao5",
+  "ao12",
+  "ao50",
+  "ao100",
+  "ao1000",
+  "best",
+  "bestTime",
+  "worstTime",
+  "mean",
+  "totalTime",
+];
+const invalidTimes = [Infinity, -Infinity, UNKNOWN, UNKNOWN / 1000];
+
+export function parseStat(solveTime: number, key: string): string {
+  return solveTime === DNF_VALUE
+    ? "DNF"
+    : invalidTimes.includes(solveTime)
+    ? "--"
+    : statsToTimeFormat.includes(key)
+    ? convertCubingTime(solveTime, ".", true, true)
+    : solveTime.toString();
 }

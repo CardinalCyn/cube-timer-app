@@ -45,39 +45,53 @@ export type ChartSeries = {
   graphDisplay: "line" | "scatter" | "both";
 };
 
+export type StatVal = { title: string; value: number };
+
 export type ImprovementStats = {
-  deviation: number;
-  ao12: number;
-  ao50: number;
-  ao100: number;
-  best: number;
-  solveCount: number;
+  deviation: StatVal;
+  ao12: StatVal;
+  ao50: StatVal;
+  ao100: StatVal;
+  best: StatVal;
+  solveCount: StatVal;
 };
 export type AverageStats = {
-  ao3: number;
-  ao5: number;
-  ao12: number;
-  ao50: number;
-  ao100: number;
-  ao1000: number;
+  ao3: StatVal;
+  ao5: StatVal;
+  ao12: StatVal;
+  ao50: StatVal;
+  ao100: StatVal;
+  ao1000: StatVal;
 };
 export type OtherStats = {
-  bestTime: number;
-  worstTime: number;
-  deviation: number;
-  mean: number;
-  totalTime: number;
-  solveCount: number;
+  bestTime: StatVal;
+  worstTime: StatVal;
+  deviation: StatVal;
+  mean: StatVal;
+  totalTime: StatVal;
+  solveCount: StatVal;
 };
-type Stat = {
+type Stat<T extends Record<string, StatVal>> = {
   header: string;
-  global: ImprovementStats | AverageStats | OtherStats;
-  currentSession: ImprovementStats | AverageStats | OtherStats;
+  global: T;
+  currentSession: T;
 };
+
+export type TimerStats = {
+  deviation: StatVal;
+  mean: StatVal;
+  best: StatVal;
+  count: StatVal;
+  ao5: StatVal;
+  ao12: StatVal;
+  ao50: StatVal;
+  ao100: StatVal;
+};
+
 export type StatisticsStatsData = {
-  improvementStats: Stat;
-  averageStats: Stat;
-  otherStats: Stat;
+  improvementStats: Stat<ImprovementStats>;
+  averageStats: Stat<AverageStats>;
+  otherStats: Stat<OtherStats>;
 };
 
 export type ColorTheme = "light" | "dark";

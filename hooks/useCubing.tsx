@@ -2,15 +2,13 @@ import { CubingContext } from "@/providers/CubingContext";
 import { useContext } from "react";
 
 export function useCubing() {
-  const context = useContext(CubingContext);
+  const { cubingContextClass } = useContext(CubingContext);
 
-  if (!context) {
-    throw new Error("useCubing must be used within a CubingProvider");
+  if (!cubingContextClass) {
+    throw new Error(
+      "CubingContextClass is not initialized. Make sure useCubing is used within a CubingProvider",
+    );
   }
 
-  const { cubingContextClass } = context;
-
-  return {
-    cubingContextClass,
-  };
+  return { cubingContextClass };
 }

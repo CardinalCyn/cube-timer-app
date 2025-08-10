@@ -4,6 +4,7 @@ import {
   DatabaseSuccess,
   SolveData,
   StatisticsStatsData,
+  TimerStats,
 } from "@/types/types";
 import { ChartDataPoint, Statistics } from "./statistics";
 
@@ -33,6 +34,15 @@ export class CubingContextClass {
     this.sessions = getSessionsData.sessions;
     this.currentSession = currentSession;
     this.trimPercentage = trimPercentage;
+    this.initializeStatistics();
+  }
+
+  private async initializeStatistics(): Promise<void> {
+    const solves = await this.db.getAllSolves();
+    if (solves.status === "error")
+      throw { error: "There was an issue with retrieving the solves" };
+    solves.solveData.forEach((solve) => this.db.removeSolve(solve.id));
+    solves.solveData.forEach((solve) => this.db.getSolveById(solve.id));
   }
 
   createNewSession(): number {
@@ -114,7 +124,7 @@ export class CubingContextClass {
   }
 
   getStatsData(): StatisticsStatsData {
-    return this.statistics.getStatsData();
+    return this.statistics.getAnalyticsStatsData();
   }
 
   getGlobalChartData(): ChartDataPoint[] {
@@ -123,5 +133,9 @@ export class CubingContextClass {
 
   getCurrentSessionChartData(): ChartDataPoint[] {
     return this.statistics.getCurrentSessionChartData();
+  }
+
+  getTimerStats(): TimerStats {
+    return this.statistics.getTimerStatsData();
   }
 }

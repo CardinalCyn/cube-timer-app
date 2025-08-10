@@ -1,6 +1,6 @@
 import { DNF_VALUE } from "@/constants/constants";
 import { calculatePenaltySolveTime } from "@/constants/utils";
-import { SolveData, StatisticsStatsData } from "@/types/types";
+import { SolveData, StatisticsStatsData, TimerStats } from "@/types/types";
 import { AverageCalculator } from "./averageCalculator";
 
 export type ChartDataPoint = {
@@ -64,6 +64,7 @@ export class Statistics {
   }
 
   addSolve(solve: SolveData): void {
+    console.log(solve);
     solve.solveTime = calculatePenaltySolveTime(solve);
     const sessionNumber = solve.session;
     const isCurrentSession = this.currentSessionIndex === sessionNumber;
@@ -141,65 +142,203 @@ export class Statistics {
     return this.globalChartData;
   }
 
-  getStatsData(): StatisticsStatsData {
+  getTimerStatsData(): TimerStats {
+    return {
+      deviation: {
+        title: "Deviation",
+        value:
+          this.currentSessionData.averages.ao3.getStandardDeviation() / 1000,
+      },
+      mean: {
+        title: "Mean",
+        value: this.currentSessionData.averages.ao3.getMeanTime(),
+      },
+      best: {
+        title: "Best",
+        value: this.currentSessionData.averages.ao3.getBestTime(),
+      },
+      count: {
+        title: "Count",
+        value: this.currentSessionData.averages.ao3.getNumSolves(),
+      },
+      ao5: {
+        title: "Ao5",
+        value: this.currentSessionData.averages.ao5.getCurrentAverage(),
+      },
+      ao12: {
+        title: "Ao12",
+        value: this.currentSessionData.averages.ao12.getCurrentAverage(),
+      },
+      ao50: {
+        title: "Ao50",
+        value: this.currentSessionData.averages.ao50.getCurrentAverage(),
+      },
+      ao100: {
+        title: "Ao100",
+        value: this.currentSessionData.averages.ao100.getCurrentAverage(),
+      },
+    };
+  }
+
+  getAnalyticsStatsData(): StatisticsStatsData {
     return {
       improvementStats: {
         header: "Improvement",
         global: {
-          solveCount: this.globalData.solveCount,
-          best: this.globalData.bestTime,
-          ao12: this.globalData.averages.ao12.getCurrentAverage(),
-          ao50: this.globalData.averages.ao50.getCurrentAverage(),
-          ao100: this.globalData.averages.ao100.getCurrentAverage(),
-          deviation: this.globalData.averages.ao5.getStandardDeviation(),
+          solveCount: {
+            title: "Solve Count",
+            value: this.globalData.solveCount,
+          },
+          best: { title: "Best", value: this.globalData.bestTime },
+          ao12: {
+            title: "Ao12",
+            value: this.globalData.averages.ao12.getCurrentAverage(),
+          },
+          ao50: {
+            title: "Ao50",
+            value: this.globalData.averages.ao50.getCurrentAverage(),
+          },
+          ao100: {
+            title: "Ao100",
+            value: this.globalData.averages.ao100.getCurrentAverage(),
+          },
+          deviation: {
+            title: "Deviation",
+            value: this.globalData.averages.ao5.getStandardDeviation() / 1000,
+          },
         },
         currentSession: {
-          solveCount: this.currentSessionData.solveCount,
-          best: this.currentSessionData.bestTime,
-          ao12: this.currentSessionData.averages.ao12.getCurrentAverage(),
-          ao50: this.currentSessionData.averages.ao50.getCurrentAverage(),
-          ao100: this.currentSessionData.averages.ao100.getCurrentAverage(),
-          deviation:
-            this.currentSessionData.averages.ao5.getStandardDeviation(), //doesn't matter what average calc to use for deviation
+          solveCount: {
+            title: "Solve Count",
+            value: this.currentSessionData.solveCount,
+          },
+          best: { title: "Best", value: this.currentSessionData.bestTime },
+          ao12: {
+            title: "Ao12",
+            value: this.currentSessionData.averages.ao12.getCurrentAverage(),
+          },
+          ao50: {
+            title: "Ao50",
+            value: this.currentSessionData.averages.ao50.getCurrentAverage(),
+          },
+          ao100: {
+            title: "Ao100",
+            value: this.currentSessionData.averages.ao100.getCurrentAverage(),
+          },
+          deviation: {
+            title: "Deviation",
+            value:
+              this.currentSessionData.averages.ao5.getStandardDeviation() /
+              1000,
+          },
         },
       },
+
       averageStats: {
         header: "Average",
         global: {
-          ao3: this.globalData.averages.ao3.getBestAverage(),
-          ao5: this.globalData.averages.ao5.getBestAverage(),
-          ao12: this.globalData.averages.ao12.getBestAverage(),
-          ao50: this.globalData.averages.ao50.getBestAverage(),
-          ao100: this.globalData.averages.ao100.getBestAverage(),
-          ao1000: this.globalData.averages.ao1000.getBestAverage(),
+          ao3: {
+            title: "Ao3",
+            value: this.globalData.averages.ao3.getBestAverage(),
+          },
+          ao5: {
+            title: "Ao5",
+            value: this.globalData.averages.ao5.getBestAverage(),
+          },
+          ao12: {
+            title: "Ao12",
+            value: this.globalData.averages.ao12.getBestAverage(),
+          },
+          ao50: {
+            title: "Ao50",
+            value: this.globalData.averages.ao50.getBestAverage(),
+          },
+          ao100: {
+            title: "Ao100",
+            value: this.globalData.averages.ao100.getBestAverage(),
+          },
+          ao1000: {
+            title: "Ao1000",
+            value: this.globalData.averages.ao1000.getBestAverage(),
+          },
         },
         currentSession: {
-          ao3: this.currentSessionData.averages.ao3.getBestAverage(),
-          ao5: this.currentSessionData.averages.ao5.getBestAverage(),
-          ao12: this.currentSessionData.averages.ao12.getBestAverage(),
-          ao50: this.currentSessionData.averages.ao50.getBestAverage(),
-          ao100: this.currentSessionData.averages.ao100.getBestAverage(),
-          ao1000: this.currentSessionData.averages.ao1000.getBestAverage(),
+          ao3: {
+            title: "Ao3",
+            value: this.currentSessionData.averages.ao3.getBestAverage(),
+          },
+          ao5: {
+            title: "Ao5",
+            value: this.currentSessionData.averages.ao5.getBestAverage(),
+          },
+          ao12: {
+            title: "Ao12",
+            value: this.currentSessionData.averages.ao12.getBestAverage(),
+          },
+          ao50: {
+            title: "Ao50",
+            value: this.currentSessionData.averages.ao50.getBestAverage(),
+          },
+          ao100: {
+            title: "Ao100",
+            value: this.currentSessionData.averages.ao100.getBestAverage(),
+          },
+          ao1000: {
+            title: "Ao1000",
+            value: this.currentSessionData.averages.ao1000.getBestAverage(),
+          },
         },
       },
+
       otherStats: {
         header: "Other",
         global: {
-          bestTime: this.globalData.bestTime,
-          worstTime: this.globalData.worstTime,
-          deviation: this.globalData.averages.ao3.getStandardDeviation(),
-          mean: this.globalData.averages.ao3.getMeanTime(),
-          solveCount: this.globalData.solveCount,
-          totalTime: this.globalData.averages.ao3.getTotalTime(),
+          bestTime: { title: "Best Time", value: this.globalData.bestTime },
+          worstTime: { title: "Worst Time", value: this.globalData.worstTime },
+          deviation: {
+            title: "Deviation",
+            value: this.globalData.averages.ao3.getStandardDeviation() / 1000,
+          },
+          mean: {
+            title: "Mean",
+            value: this.globalData.averages.ao3.getMeanTime(),
+          },
+          solveCount: {
+            title: "Solve Count",
+            value: this.globalData.solveCount,
+          },
+          totalTime: {
+            title: "Total Time",
+            value: this.globalData.averages.ao3.getTotalTime(),
+          },
         },
         currentSession: {
-          bestTime: this.currentSessionData.bestTime,
-          worstTime: this.currentSessionData.worstTime,
-          deviation:
-            this.currentSessionData.averages.ao3.getStandardDeviation(),
-          mean: this.currentSessionData.averages.ao3.getMeanTime(),
-          solveCount: this.currentSessionData.solveCount,
-          totalTime: this.currentSessionData.averages.ao3.getTotalTime(),
+          bestTime: {
+            title: "Best Time",
+            value: this.currentSessionData.bestTime,
+          },
+          worstTime: {
+            title: "Worst Time",
+            value: this.currentSessionData.worstTime,
+          },
+          deviation: {
+            title: "Deviation",
+            value:
+              this.currentSessionData.averages.ao3.getStandardDeviation() /
+              1000,
+          },
+          mean: {
+            title: "Mean",
+            value: this.currentSessionData.averages.ao3.getMeanTime(),
+          },
+          solveCount: {
+            title: "Solve Count",
+            value: this.currentSessionData.solveCount,
+          },
+          totalTime: {
+            title: "Total Time",
+            value: this.currentSessionData.averages.ao3.getTotalTime(),
+          },
         },
       },
     };

@@ -1,23 +1,45 @@
 import SolveDetailModal from "@/components/SolveDetailModal";
 import { TextCustomFont } from "@/components/TextCustomFont";
-import { DNF_VALUE, sampleSolveData } from "@/constants/constants";
+import { DNF_VALUE } from "@/constants/constants";
 import {
   calculatePenaltySolveTime,
   convertCubingTime,
 } from "@/constants/utils";
+import { useCubing } from "@/hooks/useCubing";
 import { useSettings } from "@/hooks/useSettings";
 import { SolveData } from "@/types/types";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
+import ErrorDisplay from "./ErrorDisplay";
 
 export default function History() {
   const { colors } = useSettings();
   const [selectedSolve, setSelectedSolve] = useState<SolveData | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-
+  const [solveData, setSolveData] = useState<(SolveData | null)[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const numColumns = 3;
-  const placeHolderedData: (SolveData | null)[] = [...sampleSolveData];
-  while (placeHolderedData.length % numColumns) placeHolderedData.push(null);
+
+  const { cubingContextClass } = useCubing();
+
+  useEffect(() => {
+    async function setCubingData() {
+      const cubingCurrentSessionData =
+        await cubingContextClass.getSolvesBySessionId(false, 0);
+      console.log(cubingCurrentSessionData);
+      if (cubingCurrentSessionData.status === "error") {
+        setErrorMessage(cubingCurrentSessionData.message);
+        return;
+      }
+      setErrorMessage("");
+      const data: (SolveData | null)[] = cubingCurrentSessionData.solveData;
+      while (data.length % numColumns) {
+        data.push(null);
+      }
+      setSolveData(data);
+    }
+    setCubingData();
+  }, [cubingContextClass]);
 
   const handleSolvePress = (solve: SolveData) => {
     setSelectedSolve(solve);
@@ -57,8 +79,9 @@ export default function History() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {errorMessage && <ErrorDisplay errorMessage={errorMessage} />}
       <FlatList
-        data={placeHolderedData}
+        data={solveData}
         renderItem={renderSolveItem}
         numColumns={numColumns}
         contentContainerStyle={styles.listContainer}

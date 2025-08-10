@@ -1,4 +1,4 @@
-import { AllScreens, ChartSeries, SolveData } from "@/types/types";
+import { AllScreens, ChartSeries, SolveData, TimerStats } from "@/types/types";
 import { MaterialIcons } from "@expo/vector-icons";
 
 export const allScreens: AllScreens[] = [
@@ -219,3 +219,14 @@ export const chartSeries: ChartSeries[] = [
     graphDisplay: "both",
   },
 ];
+
+export const defaultOtherStats: TimerStats = {
+  deviation: { title: "Deviation", value: Infinity },
+  mean: { title: "Mean", value: Infinity },
+  best: { title: "Best", value: Infinity },
+  count: { title: "Count", value: 0 },
+  ao5: { title: "Ao5", value: Infinity },
+  ao12: { title: "Ao12", value: Infinity },
+  ao50: { title: "Ao50", value: Infinity },
+  ao100: { title: "Ao100", value: Infinity },
+};

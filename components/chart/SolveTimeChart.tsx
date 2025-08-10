@@ -1,8 +1,8 @@
 import { DNF_VALUE } from "@/constants/constants";
 import { convertCubingTime } from "@/constants/utils";
+import { useCubing } from "@/hooks/useCubing";
 import { useSettings } from "@/hooks/useSettings";
-import { Statistics } from "@/structures.tsx/statistics";
-import { ChartSeries, SolveData } from "@/types/types";
+import { ChartSeries } from "@/types/types";
 import { useFont } from "@shopify/react-native-skia";
 import React, { ReactNode } from "react";
 import { View } from "react-native";
@@ -11,32 +11,27 @@ import SolveChartLegend from "./SolveChartLegend";
 import SolveChartStats from "./SolveChartStats";
 
 export default function SolveTimeChart({
-  solveData,
   chartSeries,
-  trimPercentage,
-  currentSession,
 }: {
-  solveData: SolveData[];
   chartSeries: ChartSeries[];
-  trimPercentage: number;
-  currentSession: number;
 }) {
   const { colors } = useSettings();
   const font = useFont(require("../../assets/fonts/SpaceMono-Regular.ttf"));
 
-  const statistics = new Statistics(trimPercentage, currentSession);
-  solveData.forEach((solve) => statistics.addSolve(solve));
+  const { cubingContextClass } = useCubing();
 
-  const chartData = statistics.getGlobalChartData().map((point, index) => {
-    return {
-      solveId: point.solveId,
-      time: point.solveTime,
-      ao5: point.ao5,
-      ao12: point.ao12,
-      index,
-      personalBest: point.personalBest,
-    };
-  });
+  const chartData = cubingContextClass
+    .getGlobalChartData()
+    .map((point, index) => {
+      return {
+        solveId: point.solveId,
+        time: point.solveTime,
+        ao5: point.ao5,
+        ao12: point.ao12,
+        index,
+        personalBest: point.personalBest,
+      };
+    });
 
   for (let i = 0; i < chartData.length; i++) {
     const point = chartData[i];
@@ -124,7 +119,7 @@ export default function SolveTimeChart({
         )}
       </CartesianChart>
       <SolveChartLegend chartSeries={chartSeries} />
-      <SolveChartStats statisticsData={statistics.getStatsData()} />
+      <SolveChartStats statisticsData={cubingContextClass.getStatsData()} />
     </View>
   );
 }

@@ -1,7 +1,6 @@
-import { DNF_VALUE, UNKNOWN } from "@/constants/constants";
-import { convertCubingTime } from "@/constants/utils";
+import { parseStat } from "@/constants/utils";
 import { useSettings } from "@/hooks/useSettings";
-import { StatisticsStatsData } from "@/types/types";
+import { StatisticsStatsData, StatVal } from "@/types/types";
 import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { TextCustomFont } from "../TextCustomFont";
@@ -17,21 +16,6 @@ export default function SolveChartStats({
   const [statSelected, setStatSelected] =
     useState<keyof StatisticsStatsData>("improvementStats");
 
-  const statsToTimeFormat = [
-    "ao3",
-    "ao5",
-    "ao12",
-    "ao50",
-    "ao100",
-    "ao1000",
-    "best",
-    "bestTime",
-    "worstTime",
-    "mean",
-    "totalTime",
-  ];
-
-  const invalidTimes = [Infinity, -Infinity, UNKNOWN];
   return (
     <View
       style={[styles.statsContainer, { backgroundColor: colors.background }]}
@@ -100,9 +84,12 @@ export default function SolveChartStats({
         <View style={styles.dataContainer}>
           {Object.keys(statisticsData[statSelected].global).map(
             (key, index) => {
-              const global = statisticsData[statSelected].global;
-              const currentSession =
-                statisticsData[statSelected].currentSession;
+              const global = statisticsData[statSelected].global as Record<
+                string,
+                StatVal
+              >;
+              const currentSession = statisticsData[statSelected]
+                .currentSession as Record<string, StatVal>;
               const isEven = index % 2 === 0;
 
               return (
@@ -124,41 +111,18 @@ export default function SolveChartStats({
                     <TextCustomFont
                       style={[styles.dataText, { color: colors.text }]}
                     >
-                      {global[key as keyof typeof global] === DNF_VALUE
-                        ? "DNF"
-                        : invalidTimes.includes(
-                            global[key as keyof typeof global],
-                          )
-                        ? "--"
-                        : statsToTimeFormat.includes(key)
-                        ? convertCubingTime(
-                            global[key as keyof typeof currentSession],
-                            ".",
-                            true,
-                            true,
-                          )
-                        : global[key as keyof typeof global]}
+                      {parseStat(global[key as keyof typeof global].value, key)}
                     </TextCustomFont>
                   </View>
                   <View style={[styles.statsCol, styles.dataCol]}>
                     <TextCustomFont
                       style={[styles.dataText, { color: colors.text }]}
                     >
-                      {currentSession[key as keyof typeof currentSession] ===
-                      DNF_VALUE
-                        ? "DNF"
-                        : invalidTimes.includes(
-                            currentSession[key as keyof typeof currentSession],
-                          )
-                        ? "--"
-                        : statsToTimeFormat.includes(key)
-                        ? convertCubingTime(
-                            currentSession[key as keyof typeof currentSession],
-                            ".",
-                            true,
-                            true,
-                          )
-                        : currentSession[key as keyof typeof currentSession]}
+                      {parseStat(
+                        currentSession[key as keyof typeof currentSession]
+                          .value,
+                        key,
+                      )}
                     </TextCustomFont>
                   </View>
                 </View>

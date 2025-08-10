@@ -34,7 +34,7 @@ export class Database {
     this.db.execSync(createTableSolvesSql);
 
     const indexSolvesSql = /*sql*/ `
-          CREATE INDEX IF NOT EXISTS solve_Date ON solves (session_id);
+          CREATE INDEX IF NOT EXISTS idx_session_id ON solves (session_id);
     `;
     this.db.execSync(indexSolvesSql);
   }
@@ -53,7 +53,10 @@ export class Database {
       console.error(err);
       return {
         status: "error",
-        message: "There was an issue with retrieving the sessions",
+        message:
+          err instanceof Error
+            ? err.message
+            : "There was an issue with retrieving the sessions",
       };
     }
   }
@@ -68,14 +71,14 @@ export class Database {
             , solve_date
             , penalty_state
             , session_id
-        )\
+        )
         VALUES (
             $scramble
             , $solve_time
             , $solve_date
             , $penalty_state
             , $session_id
-        )\
+        )
     `;
 
     const statement = await this.db.prepareAsync(addSolveSql);
@@ -87,13 +90,15 @@ export class Database {
         $penalty_state: solveData.penaltyState,
         $session_id: solveData.session,
       });
-      console.log(result);
       return { status: "success", solveId: result.lastInsertRowId };
     } catch (err: unknown) {
-      console.log(err);
+      console.error(err);
       return {
         status: "error",
-        message: "There was an issue with adding the solve",
+        message:
+          err instanceof Error
+            ? err.message
+            : "There was an issue with adding the solve",
       };
     } finally {
       await statement.finalizeAsync();
@@ -102,20 +107,22 @@ export class Database {
 
   async removeSolve(solveId: number): Promise<DatabaseSuccess | DatabaseError> {
     try {
-      const addSolveSql = /*sql*/ `
+      const removeSolveSql = /*sql*/ `
             DELETE FROM solves
-            WHERE id = ?
+            WHERE id = $solveId
         `;
 
-      const res = await this.db.runAsync(addSolveSql, [solveId]);
-      console.log(res);
+      await this.db.runAsync(removeSolveSql, { $solveId: solveId });
 
       return { status: "success" };
     } catch (err: unknown) {
-      console.log(err);
+      console.error(err);
       return {
         status: "error",
-        message: `There was an error with removing solve of id: ${solveId}`,
+        message:
+          err instanceof Error
+            ? err.message
+            : `There was an error with removing solve of id: ${solveId}`,
       };
     }
   }
@@ -133,11 +140,8 @@ export class Database {
                 , penalty_state
                 , session_id
             FROM solves
-            WHERE
-
         `;
       const res = await this.db.getAllAsync<GetSolveData>(getSolveByIdSql);
-
       if (!res)
         return {
           status: "error",
@@ -166,10 +170,13 @@ export class Database {
 
       return { status: "success", solveData: solves };
     } catch (err: unknown) {
-      console.log(err);
+      console.error(err);
       return {
         status: "error",
-        message: `There was an issue with getting all solves`,
+        message:
+          err instanceof Error
+            ? err.message
+            : `There was an issue with getting all solves`,
       };
     }
   }
@@ -224,10 +231,13 @@ export class Database {
 
       return { status: "success", solveData: solves };
     } catch (err: unknown) {
-      console.log(err);
+      console.error(err);
       return {
         status: "error",
-        message: `There was an issue with getting solves by the session of ${sessionId}`,
+        message:
+          err instanceof Error
+            ? err.message
+            : `There was an issue with getting solves by the session of ${sessionId}`,
       };
     }
   }
@@ -246,11 +256,11 @@ export class Database {
                 , session_id
             FROM solves
             WHERE
-                id = ?
+                id = $id
         `;
-      const res = await this.db.getFirstAsync<GetSolveData>(getSolveByIdSql, [
-        solveId,
-      ]);
+      const res = await this.db.getFirstAsync<GetSolveData>(getSolveByIdSql, {
+        id: solveId,
+      });
 
       if (!res)
         return {
@@ -276,10 +286,13 @@ export class Database {
 
       return { status: "success", solveData };
     } catch (err: unknown) {
-      console.log(err);
+      console.error(err);
       return {
         status: "error",
-        message: `There was an issue with getting the solve by the id of ${solveId}`,
+        message:
+          err instanceof Error
+            ? err.message
+            : `There was an issue with getting the solve by the id of ${solveId}`,
       };
     }
   }
@@ -302,10 +315,13 @@ export class Database {
 
       return { status: "success" };
     } catch (err: unknown) {
-      console.log(err);
+      console.error(err);
       return {
         status: "error",
-        message: `There was an issue with updating the penalty state by id of ${solveId}`,
+        message:
+          err instanceof Error
+            ? err.message
+            : `There was an issue with updating the penalty state by id of ${solveId}`,
       };
     }
   }

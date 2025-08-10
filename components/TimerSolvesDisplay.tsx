@@ -1,12 +1,13 @@
+import { parseStat } from "@/constants/utils";
 import { useSettings } from "@/hooks/useSettings";
-import { TimerSolvesData } from "@/types/types";
+import { TimerStats } from "@/types/types";
 import { StyleSheet, View } from "react-native";
 import { TextCustomFont } from "./TextCustomFont";
 
 export default function TimerSolveDisplay({
   timerSolvesData,
 }: {
-  timerSolvesData: TimerSolvesData;
+  timerSolvesData: TimerStats;
 }) {
   const { colors } = useSettings();
 
@@ -18,12 +19,12 @@ export default function TimerSolveDisplay({
     <View>
       {keys.map((key) => (
         <TextCustomFont key={key} style={[styles.text, { color: colors.text }]}>
-          {key[0].toUpperCase() +
-            key.slice(1) +
+          {timerSolvesData[key as keyof typeof timerSolvesData].title +
             ": " +
-            (timerSolvesData[key as keyof typeof timerSolvesData]
-              ? timerSolvesData[key as keyof typeof timerSolvesData]
-              : "--")}
+            parseStat(
+              timerSolvesData[key as keyof typeof timerSolvesData].value,
+              key,
+            )}
         </TextCustomFont>
       ))}
     </View>
@@ -43,6 +44,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   text: {
-    fontSize: 25,
+    fontSize: 14,
   },
 });
