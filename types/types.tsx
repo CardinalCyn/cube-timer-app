@@ -1,3 +1,5 @@
+import { scrData } from "@/constants/constants";
+
 export type AllScreens = {
   name: string;
   options: {
@@ -109,3 +111,5 @@ export type DatabaseError = {
   status: "error";
   message: string;
 };
+
+export type ScrambleCategory = keyof typeof scrData;

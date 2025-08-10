@@ -8,7 +8,8 @@ import {
 import { useCubing } from "@/hooks/useCubing";
 import { useSettings } from "@/hooks/useSettings";
 import { SolveData } from "@/types/types";
-import React, { useEffect, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useState } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 import ErrorDisplay from "./ErrorDisplay";
 
@@ -22,24 +23,25 @@ export default function History() {
 
   const { cubingContextClass } = useCubing();
 
-  useEffect(() => {
-    async function setCubingData() {
-      const cubingCurrentSessionData =
-        await cubingContextClass.getSolvesBySessionId(false, 0);
-      console.log(cubingCurrentSessionData);
-      if (cubingCurrentSessionData.status === "error") {
-        setErrorMessage(cubingCurrentSessionData.message);
-        return;
+  useFocusEffect(
+    useCallback(() => {
+      async function setCubingData() {
+        const cubingCurrentSessionData =
+          await cubingContextClass.getSolvesBySessionId(false, 0);
+        if (cubingCurrentSessionData.status === "error") {
+          setErrorMessage(cubingCurrentSessionData.message);
+          return;
+        }
+        setErrorMessage("");
+        const data: (SolveData | null)[] = cubingCurrentSessionData.solveData;
+        while (data.length % numColumns) {
+          data.push(null);
+        }
+        setSolveData(data);
       }
-      setErrorMessage("");
-      const data: (SolveData | null)[] = cubingCurrentSessionData.solveData;
-      while (data.length % numColumns) {
-        data.push(null);
-      }
-      setSolveData(data);
-    }
-    setCubingData();
-  }, [cubingContextClass]);
+      setCubingData();
+    }, [cubingContextClass]),
+  );
 
   const handleSolvePress = (solve: SolveData) => {
     setSelectedSolve(solve);

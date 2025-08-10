@@ -64,7 +64,6 @@ export class Statistics {
   }
 
   addSolve(solve: SolveData): void {
-    console.log(solve);
     solve.solveTime = calculatePenaltySolveTime(solve);
     const sessionNumber = solve.session;
     const isCurrentSession = this.currentSessionIndex === sessionNumber;

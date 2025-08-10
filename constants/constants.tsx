@@ -230,3 +230,74 @@ export const defaultOtherStats: TimerStats = {
   ao50: { title: "Ao50", value: Infinity },
   ao100: { title: "Ao100", value: Infinity },
 };
+
+type ScrData = { title: string; scrambleCode: string; lengthModifier: number };
+
+export const scrData: { WCA: ScrData[]; "3x3x3 subsets": ScrData[] } = {
+  WCA: [
+    { title: "3x3x3", scrambleCode: "333", lengthModifier: 0 },
+    { title: "2x2x2", scrambleCode: "222so", lengthModifier: 0 },
+    { title: "4x4x4", scrambleCode: "444wca", lengthModifier: -40 },
+    { title: "5x5x5", scrambleCode: "555wca", lengthModifier: -60 },
+    { title: "6x6x6", scrambleCode: "666wca", lengthModifier: -80 },
+    { title: "7x7x7", scrambleCode: "777wca", lengthModifier: -100 },
+    { title: "3x3 bld", scrambleCode: "333ni", lengthModifier: 0 },
+    { title: "3x3 fm", scrambleCode: "333fm", lengthModifier: 0 },
+    { title: "3x3 oh", scrambleCode: "333oh", lengthModifier: 0 },
+    { title: "clock", scrambleCode: "clkwca", lengthModifier: 0 },
+    { title: "megaminx", scrambleCode: "mgmp", lengthModifier: -70 },
+    { title: "pyraminx", scrambleCode: "pyrso", lengthModifier: -10 },
+    { title: "skewb", scrambleCode: "skbso", lengthModifier: 0 },
+    { title: "sq1", scrambleCode: "sqrs", lengthModifier: 0 },
+    { title: "4x4 bld", scrambleCode: "444bld", lengthModifier: -40 },
+    { title: "5x5 bld", scrambleCode: "555bld", lengthModifier: -60 },
+    { title: "3x3 mbld", scrambleCode: "r3ni", lengthModifier: 5 },
+  ],
+  "3x3x3 subsets": [
+    {
+      title: "2-generator R,U",
+      scrambleCode: "2gen",
+      lengthModifier: 0,
+    },
+    {
+      title: "2-generator L,U",
+      scrambleCode: "2genl",
+      lengthModifier: 0,
+    },
+    {
+      title: "Roux-generator M,U",
+      scrambleCode: "roux",
+      lengthModifier: 25,
+    },
+    {
+      title: "3-generator F,R,U",
+      scrambleCode: "3gen_F",
+      lengthModifier: 0,
+    },
+    {
+      title: "3-generator R,U,L",
+      scrambleCode: "3gen_L",
+      lengthModifier: 0,
+    },
+    {
+      title: "3-generator R,r,U",
+      scrambleCode: "RrU",
+      lengthModifier: 25,
+    },
+    {
+      title: "Domino Subgroup",
+      scrambleCode: "333drud",
+      lengthModifier: 0,
+    },
+    {
+      title: "half turns only",
+      scrambleCode: "half",
+      lengthModifier: 0,
+    },
+    {
+      title: "last slot + last layer (old)",
+      scrambleCode: "lsll",
+      lengthModifier: 15,
+    },
+  ],
+};
