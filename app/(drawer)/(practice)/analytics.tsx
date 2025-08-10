@@ -5,11 +5,11 @@ import {
   sampleSolveData,
   trimPercentage,
 } from "@/constants/constants";
-import { useTheme } from "@/hooks/useTheme";
+import { useSettings } from "@/hooks/useSettings";
 import { View } from "react-native";
 
 export default function PracticeAnalytics() {
-  const { colors } = useTheme();
+  const { colors } = useSettings();
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>

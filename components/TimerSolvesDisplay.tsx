@@ -1,4 +1,4 @@
-import { useTheme } from "@/hooks/useTheme";
+import { useSettings } from "@/hooks/useSettings";
 import { TimerSolvesData } from "@/types/types";
 import { StyleSheet, View } from "react-native";
 import { TextCustomFont } from "./TextCustomFont";
@@ -8,7 +8,7 @@ export default function TimerSolveDisplay({
 }: {
   timerSolvesData: TimerSolvesData;
 }) {
-  const { colors } = useTheme();
+  const { colors } = useSettings();
 
   const dataKeys = Object.keys(timerSolvesData);
   const leftColumnKeys = dataKeys.slice(0, Math.ceil(dataKeys.length / 2));

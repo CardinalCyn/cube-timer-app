@@ -1,6 +1,6 @@
 import { DNF_VALUE } from "@/constants/constants";
 import { convertCubingTime } from "@/constants/utils";
-import { useTheme } from "@/hooks/useTheme";
+import { useSettings } from "@/hooks/useSettings";
 import { Statistics } from "@/structures.tsx/statistics";
 import { ChartSeries, SolveData } from "@/types/types";
 import { useFont } from "@shopify/react-native-skia";
@@ -21,7 +21,7 @@ export default function SolveTimeChart({
   trimPercentage: number;
   currentSession: number;
 }) {
-  const { colors } = useTheme();
+  const { colors } = useSettings();
   const font = useFont(require("../../assets/fonts/SpaceMono-Regular.ttf"));
 
   const statistics = new Statistics(trimPercentage, currentSession);

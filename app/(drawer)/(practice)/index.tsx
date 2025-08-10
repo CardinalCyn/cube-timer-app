@@ -1,12 +1,12 @@
 import Timer from "@/components/Timer";
 import TimerSolveDisplay from "@/components/TimerSolvesDisplay";
-import { useTheme } from "@/hooks/useTheme";
+import { useSettings } from "@/hooks/useSettings";
 import { TimerSolvesData } from "@/types/types";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 export default function PracticeTimer() {
-  const { colors } = useTheme();
+  const { colors } = useSettings();
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<number | null>(null);

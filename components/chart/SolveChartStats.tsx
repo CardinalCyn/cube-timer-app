@@ -1,6 +1,6 @@
 import { DNF_VALUE, UNKNOWN } from "@/constants/constants";
 import { convertCubingTime } from "@/constants/utils";
-import { useTheme } from "@/hooks/useTheme";
+import { useSettings } from "@/hooks/useSettings";
 import { StatisticsStatsData } from "@/types/types";
 import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
@@ -13,7 +13,7 @@ type SolveChartStatsProps = {
 export default function SolveChartStats({
   statisticsData,
 }: SolveChartStatsProps) {
-  const { colors } = useTheme();
+  const { colors } = useSettings();
   const [statSelected, setStatSelected] =
     useState<keyof StatisticsStatsData>("improvementStats");
 

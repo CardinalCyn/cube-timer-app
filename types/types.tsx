@@ -79,3 +79,19 @@ export type StatisticsStatsData = {
   averageStats: Stat;
   otherStats: Stat;
 };
+
+export type ColorTheme = "light" | "dark";
+
+export type AppSettings = {
+  theme: "light" | "dark";
+  trimPercentage: number;
+};
+
+export type DatabaseSuccess = {
+  status: "success";
+};
+
+export type DatabaseError = {
+  status: "error";
+  message: string;
+};

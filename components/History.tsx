@@ -5,13 +5,13 @@ import {
   calculatePenaltySolveTime,
   convertCubingTime,
 } from "@/constants/utils";
-import { useTheme } from "@/hooks/useTheme";
+import { useSettings } from "@/hooks/useSettings";
 import { SolveData } from "@/types/types";
 import React, { useState } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 
 export default function History() {
-  const { colors } = useTheme();
+  const { colors } = useSettings();
   const [selectedSolve, setSelectedSolve] = useState<SolveData | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 

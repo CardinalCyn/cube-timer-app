@@ -1,8 +1,8 @@
-import { useTheme } from "@/hooks/useTheme";
+import { useSettings } from "@/hooks/useSettings";
 import { Text as RNText, TextProps } from "react-native";
 
 export function TextCustomFont(props: TextProps) {
-  const { colors } = useTheme();
+  const { colors } = useSettings();
 
   return (
     <RNText

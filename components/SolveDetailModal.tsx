@@ -3,7 +3,7 @@ import {
   calculatePenaltySolveTime,
   convertCubingTime,
 } from "@/constants/utils";
-import { useTheme } from "@/hooks/useTheme";
+import { useSettings } from "@/hooks/useSettings";
 import { SolveData } from "@/types/types";
 import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
@@ -20,7 +20,7 @@ export default function SolveDetailModal({
   onClose,
   solveData,
 }: SolveDetailModalProps) {
-  const { colors } = useTheme();
+  const { colors } = useSettings();
 
   if (!solveData) return null;
 

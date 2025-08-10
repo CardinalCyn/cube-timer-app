@@ -77,6 +77,8 @@ export const themes: {
 export const DNF_VALUE = Number.MAX_SAFE_INTEGER;
 export const UNKNOWN = -666;
 
+export const DEFAULT_TRIM_PERCENTAGE = 5;
+
 export const sampleSolveData: SolveData[] = [
   {
     id: 1,

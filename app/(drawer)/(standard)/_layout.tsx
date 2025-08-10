@@ -1,10 +1,10 @@
 // app/(drawer)/timer/_layout.tsx
 import { allTabs } from "@/constants/constants";
-import { useTheme } from "@/hooks/useTheme";
+import { useSettings } from "@/hooks/useSettings";
 import { Tabs } from "expo-router";
 
 export default function StandardLayout() {
-  const { colors } = useTheme();
+  const { colors } = useSettings();
   return (
     <Tabs
       screenOptions={{

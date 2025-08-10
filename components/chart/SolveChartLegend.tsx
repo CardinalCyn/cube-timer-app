@@ -1,4 +1,4 @@
-import { useTheme } from "@/hooks/useTheme";
+import { useSettings } from "@/hooks/useSettings";
 import { ChartSeries } from "@/types/types";
 import React from "react";
 import { StyleSheet, View } from "react-native";
@@ -11,7 +11,7 @@ interface SolveChartLegendProps {
 export default function SolveChartLegend({
   chartSeries,
 }: SolveChartLegendProps) {
-  const { colors } = useTheme();
+  const { colors } = useSettings();
   return (
     <View
       style={[styles.legendContainer, { backgroundColor: colors.background }]}
