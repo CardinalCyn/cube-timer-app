@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import ErrorDisplay from "./ErrorDisplay";
 import TimerDisplay from "./TimerDisplay";
-import TimerSolveDisplay from "./TimerSolvesDisplay";
+import TimerStatsDisplay from "./TimerStatsDisplay";
 
 export default function Timer() {
   const { colors } = useSettings();
@@ -80,13 +80,13 @@ export default function Timer() {
   }, []);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container]}>
       <ErrorDisplay errorMessage={errorMessage} />
       <Pressable style={styles.pressableContainer} onPress={toggleTimer}>
         <View style={styles.timerContainer}>
           <TimerDisplay elapsedTime={elapsedTime} />
         </View>
-        <TimerSolveDisplay timerSolvesData={timerSolvesData} />
+        <TimerStatsDisplay timerSolvesData={timerSolvesData} />
       </Pressable>
     </View>
   );

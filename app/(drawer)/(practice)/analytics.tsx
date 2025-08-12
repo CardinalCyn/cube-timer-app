@@ -7,7 +7,7 @@ export default function PracticeAnalytics() {
   const { colors } = useSettings();
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1 }}>
       <SolveTimeChart chartSeries={chartSeries} />
     </View>
   );

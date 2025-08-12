@@ -1,13 +1,10 @@
 import SolveTimeChart from "@/components/chart/SolveTimeChart";
 import { chartSeries } from "@/constants/constants";
-import { useSettings } from "@/hooks/useSettings";
 import { View } from "react-native";
 
 export default function StandardAnalytics() {
-  const { colors } = useSettings();
-
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1 }}>
       <SolveTimeChart chartSeries={chartSeries} />
     </View>
   );

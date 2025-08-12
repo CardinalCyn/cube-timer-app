@@ -7,8 +7,8 @@ type NavBarProps = {
 
 export default function NavBar({ pathname }: NavBarProps) {
   return (
-    <View>
-      <TextCustomFont>{pathname}</TextCustomFont>
+    <View style={{}}>
+      <TextCustomFont>pathname: {pathname}</TextCustomFont>
     </View>
   );
 }

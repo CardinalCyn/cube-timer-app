@@ -4,7 +4,7 @@ import { TimerStats } from "@/types/types";
 import { StyleSheet, View } from "react-native";
 import { TextCustomFont } from "./TextCustomFont";
 
-export default function TimerSolveDisplay({
+export default function TimerStatsDisplay({
   timerSolvesData,
 }: {
   timerSolvesData: TimerStats;
@@ -31,7 +31,7 @@ export default function TimerSolveDisplay({
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container]}>
       {renderColumn(leftColumnKeys)}
       {renderColumn(rightColumnKeys)}
     </View>

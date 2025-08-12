@@ -83,7 +83,7 @@ export default function SolveTimeChart({
     );
   }
   return (
-    <View style={{ height: 600, backgroundColor: colors.background }}>
+    <View style={{ height: 600 }}>
       <CartesianChart
         data={chartData}
         xKey={"index"}

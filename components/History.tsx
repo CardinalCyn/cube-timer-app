@@ -80,7 +80,7 @@ export default function History() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container]}>
       {errorMessage && <ErrorDisplay errorMessage={errorMessage} />}
       <FlatList
         data={solveData}

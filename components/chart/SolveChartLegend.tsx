@@ -13,9 +13,7 @@ export default function SolveChartLegend({
 }: SolveChartLegendProps) {
   const { colors } = useSettings();
   return (
-    <View
-      style={[styles.legendContainer, { backgroundColor: colors.background }]}
-    >
+    <View style={[styles.legendContainer]}>
       {chartSeries.map((series) => (
         <View key={series.property} style={styles.legendItem}>
           <View
