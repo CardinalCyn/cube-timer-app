@@ -2,7 +2,13 @@ import { CubingContext } from "@/providers/CubingContext";
 import { useContext } from "react";
 
 export function useCubing() {
-  const { cubingContextClass } = useContext(CubingContext);
+  const {
+    cubingContextClass,
+    currentTimerPuzzleCategory,
+    setCurrentTimerPuzzleCategory,
+    currentPracticePuzzleCategory,
+    setCurrentPracticePuzzleCategory,
+  } = useContext(CubingContext);
 
   if (!cubingContextClass) {
     throw new Error(
@@ -10,5 +16,11 @@ export function useCubing() {
     );
   }
 
-  return { cubingContextClass };
+  return {
+    cubingContextClass,
+    currentTimerPuzzleCategory,
+    setCurrentTimerPuzzleCategory,
+    currentPracticePuzzleCategory,
+    setCurrentPracticePuzzleCategory,
+  };
 }

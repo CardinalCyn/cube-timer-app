@@ -8,8 +8,7 @@ import {
 import { useCubing } from "@/hooks/useCubing";
 import { useSettings } from "@/hooks/useSettings";
 import { SolveData } from "@/types/types";
-import { useFocusEffect } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 import ErrorDisplay from "./ErrorDisplay";
 
@@ -17,31 +16,21 @@ export default function History() {
   const { colors } = useSettings();
   const [selectedSolve, setSelectedSolve] = useState<SolveData | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [solveData, setSolveData] = useState<(SolveData | null)[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const numColumns = 3;
 
   const { cubingContextClass } = useCubing();
-
-  useFocusEffect(
-    useCallback(() => {
-      async function setCubingData() {
-        const cubingCurrentSessionData =
-          await cubingContextClass.getSolvesBySessionId(false, 0);
-        if (cubingCurrentSessionData.status === "error") {
-          setErrorMessage(cubingCurrentSessionData.message);
-          return;
-        }
-        setErrorMessage("");
-        const data: (SolveData | null)[] = cubingCurrentSessionData.solveData;
-        while (data.length % numColumns) {
-          data.push(null);
-        }
-        setSolveData(data);
-      }
-      setCubingData();
-    }, [cubingContextClass]),
+  const getSolvesBySessionIdResult = cubingContextClass.getSolvesBySessionId(
+    false,
+    0,
   );
+  let solveData: (SolveData | null)[] = [];
+  if (getSolvesBySessionIdResult.status === "error") {
+    setErrorMessage(getSolvesBySessionIdResult.message);
+  } else {
+    solveData = getSolvesBySessionIdResult.solveData;
+    while (solveData.length % numColumns) solveData.push(null);
+  }
 
   const handleSolvePress = (solve: SolveData) => {
     setSelectedSolve(solve);
@@ -54,13 +43,16 @@ export default function History() {
   };
 
   const renderSolveItem = ({ item: solve }: { item: SolveData | null }) => {
-    if (solve === null) return <View style={styles.pressableContainer} />;
+    if (solve === null) {
+      return <View style={styles.pressableContainer} />;
+    }
+
     return (
       <Pressable
         style={[styles.pressableContainer, { backgroundColor: colors.card }]}
         onPress={() => handleSolvePress(solve)}
       >
-        <TextCustomFont style={[styles.solveTime]}>
+        <TextCustomFont style={[styles.solveTime, { color: colors.text }]}>
           {solve.solveTime === DNF_VALUE
             ? "DNF"
             : convertCubingTime(
@@ -71,7 +63,7 @@ export default function History() {
               )}
         </TextCustomFont>
         {solve.date && (
-          <TextCustomFont style={[styles.date]}>
+          <TextCustomFont style={[styles.date, { color: colors.text }]}>
             {new Date(solve.date).toLocaleDateString()}
           </TextCustomFont>
         )}
@@ -79,17 +71,32 @@ export default function History() {
     );
   };
 
+  const renderEmptyState = () => (
+    <View style={styles.emptyContainer}>
+      <TextCustomFont style={[styles.emptyText, { color: colors.text }]}>
+        No solves yet. Start timing to see your history!
+      </TextCustomFont>
+    </View>
+  );
+
   return (
     <View style={[styles.container]}>
-      {errorMessage && <ErrorDisplay errorMessage={errorMessage} />}
-      <FlatList
-        data={solveData}
-        renderItem={renderSolveItem}
-        numColumns={numColumns}
-        contentContainerStyle={styles.listContainer}
-        columnWrapperStyle={styles.row}
-        showsVerticalScrollIndicator={false}
-      />
+      {errorMessage ? (
+        <ErrorDisplay errorMessage={errorMessage} />
+      ) : (
+        <FlatList
+          data={solveData}
+          renderItem={renderSolveItem}
+          numColumns={numColumns}
+          contentContainerStyle={[
+            styles.listContainer,
+            solveData.length === 0 && styles.emptyListContainer,
+          ]}
+          columnWrapperStyle={solveData.length > 0 ? styles.row : undefined}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={renderEmptyState}
+        />
+      )}
 
       <SolveDetailModal
         visible={modalVisible}
@@ -105,8 +112,17 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  centerContent: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
   listContainer: {
     paddingBottom: 20,
+  },
+  emptyListContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   row: {
     justifyContent: "space-between",
@@ -130,5 +146,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
     opacity: 0.5,
+  },
+  emptyContainer: {
+    padding: 32,
+    alignItems: "center",
+  },
+  emptyText: {
+    fontSize: 16,
+    textAlign: "center",
+    opacity: 0.7,
+  },
+  loadingText: {
+    fontSize: 16,
   },
 });

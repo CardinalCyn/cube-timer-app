@@ -1,15 +1,13 @@
 import { parseStat } from "@/constants/utils";
+import { useCubing } from "@/hooks/useCubing";
 import { useSettings } from "@/hooks/useSettings";
-import { TimerStats } from "@/types/types";
 import { StyleSheet, View } from "react-native";
 import { TextCustomFont } from "./TextCustomFont";
 
-export default function TimerStatsDisplay({
-  timerSolvesData,
-}: {
-  timerSolvesData: TimerStats;
-}) {
+export default function TimerStatsDisplay() {
   const { colors } = useSettings();
+  const { cubingContextClass } = useCubing();
+  const timerSolvesData = cubingContextClass.getTimerStats();
 
   const dataKeys = Object.keys(timerSolvesData);
   const leftColumnKeys = dataKeys.slice(0, Math.ceil(dataKeys.length / 2));

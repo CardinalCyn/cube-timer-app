@@ -9,11 +9,11 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { Modal, Pressable, StyleSheet, View } from "react-native";
 
-interface SolveDetailModalProps {
+type SolveDetailModalProps = {
   visible: boolean;
   onClose: () => void;
   solveData: SolveData | null;
-}
+};
 
 export default function SolveDetailModal({
   visible,

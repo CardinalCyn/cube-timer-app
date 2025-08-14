@@ -1,8 +1,14 @@
 import {
+  isPenaltyState,
+  isSubsetScrambleCode,
+  isWCAScrambleCode,
+} from "@/constants/utils";
+import {
   DatabaseError,
   DatabaseSuccess,
   PenaltyState,
   SolveData,
+  ValidPuzzleCode,
 } from "@/types/types";
 import * as SQLite from "expo-sqlite";
 // {
@@ -29,25 +35,66 @@ export class Database {
             , solve_date NUMBER NOT NULL
             , penalty_state TEXT NOT NULL
             , session_id NUMBER NOT NULL
+            , puzzle_code TEXT NOT NULL
         );
     `;
     this.db.execSync(createTableSolvesSql);
 
     const indexSolvesSql = /*sql*/ `
           CREATE INDEX IF NOT EXISTS idx_session_id ON solves (session_id);
+          CREATE INDEX IF NOT EXISTS idx_puzzle_code ON solves (puzzle_code)
     `;
     this.db.execSync(indexSolvesSql);
   }
 
-  getSessions(): (DatabaseSuccess & { sessions: number[] }) | DatabaseError {
+  getSessions():
+    | (DatabaseSuccess & {
+        sessions: { session_id: number; puzzle_code: string }[];
+      })
+    | DatabaseError {
+    try {
+      const getSessionsSql = /*sql*/ `
+      SELECT DISTINCT
+        session_id
+        , puzzle_code
+      FROM solves
+    `;
+
+      const sessions = this.db.getAllSync<{
+        session_id: number;
+        puzzle_code: string;
+      }>(getSessionsSql);
+
+      return { status: "success", sessions };
+    } catch (err: unknown) {
+      console.error(err);
+      return {
+        status: "error",
+        message:
+          err instanceof Error
+            ? err.message
+            : "There was an issue with retrieving the sessions",
+      };
+    }
+  }
+
+  getSessionsByPuzzleType({
+    puzzleType,
+  }: {
+    puzzleType: ValidPuzzleCode;
+  }): (DatabaseSuccess & { sessions: number[] }) | DatabaseError {
     try {
       const getSessionsSql = /*sql*/ `
       SELECT DISTINCT
         session_id
       FROM solves
+      WHERE puzzle_code = $puzzle_code
     `;
 
-      const sessions = this.db.getAllSync<number>(getSessionsSql);
+      const sessions = this.db.getAllSync<number>(getSessionsSql, {
+        $puzzle_code: puzzleType,
+      });
+
       return { status: "success", sessions };
     } catch (err: unknown) {
       console.error(err);
@@ -71,6 +118,7 @@ export class Database {
             , solve_date
             , penalty_state
             , session_id
+            , puzzle_code
         )
         VALUES (
             $scramble
@@ -78,6 +126,7 @@ export class Database {
             , $solve_date
             , $penalty_state
             , $session_id
+            , $puzzle_code
         )
     `;
 
@@ -89,6 +138,7 @@ export class Database {
         $solve_date: solveData.date.getTime(),
         $penalty_state: solveData.penaltyState,
         $session_id: solveData.session,
+        $puzzle_code: solveData.puzzleScrambleCode,
       });
       return { status: "success", solveId: result.lastInsertRowId };
     } catch (err: unknown) {
@@ -127,9 +177,9 @@ export class Database {
     }
   }
 
-  async getAllSolves(): Promise<
-    (DatabaseSuccess & { solveData: SolveData[] }) | DatabaseError
-  > {
+  getAllSolvesByPuzzleCode(
+    puzzleCode: ValidPuzzleCode,
+  ): (DatabaseSuccess & { solveData: SolveData[] }) | DatabaseError {
     try {
       const getSolveByIdSql = /*sql*/ `
             SELECT
@@ -139,9 +189,13 @@ export class Database {
                 , solve_date
                 , penalty_state
                 , session_id
+                , puzzle_code
             FROM solves
+            WHERE puzzle_code = $puzzle_code
         `;
-      const res = await this.db.getAllAsync<GetSolveData>(getSolveByIdSql);
+      const res = this.db.getAllSync<GetSolveData>(getSolveByIdSql, {
+        $puzzle_code: puzzleCode,
+      });
       if (!res)
         return {
           status: "error",
@@ -151,20 +205,24 @@ export class Database {
       const solves: SolveData[] = [];
 
       for (const solve of res) {
-        let penaltyState = solve.penalty_state;
+        const penaltyState: PenaltyState = isPenaltyState(solve.penalty_state)
+          ? solve.penalty_state
+          : "DNF";
+
         if (
-          !["noPenalty", "+2", "DNF"].includes(
-            solve.penalty_state as PenaltyState,
-          )
+          !isWCAScrambleCode(solve.puzzle_code) &&
+          !isSubsetScrambleCode(solve.puzzle_code)
         )
-          penaltyState = "DNF";
+          return { status: "error", message: "The puzzle code is invalid" };
+
         solves.push({
           id: solve.id,
           scramble: solve.scramble,
           date: new Date(solve.solve_date),
           solveTime: solve.solve_time,
-          penaltyState: penaltyState as PenaltyState,
+          penaltyState,
           session: solve.session_id,
+          puzzleScrambleCode: solve.puzzle_code,
         });
       }
 
@@ -182,10 +240,11 @@ export class Database {
   }
 
   /*Gets solves based on the session id. if isHistorical is true, retrieves all solves that are not of the session*/
-  async getSolvesBySession(
+  getSolvesBySessionPuzzleCode(
     isHistorical: boolean,
     sessionId: number,
-  ): Promise<(DatabaseSuccess & { solveData: SolveData[] }) | DatabaseError> {
+    puzzleCode: ValidPuzzleCode,
+  ): (DatabaseSuccess & { solveData: SolveData[] }) | DatabaseError {
     try {
       const getSolveByIdSql = /*sql*/ `
             SELECT
@@ -195,13 +254,16 @@ export class Database {
                 , solve_date
                 , penalty_state
                 , session_id
+                , puzzle_code
             FROM solves
             WHERE
-                session_id ${isHistorical ? "!=" : "="} ?
+              session_id ${isHistorical ? "!=" : "="} $session_id
+              AND puzzle_code = $puzzle_code
         `;
-      const res = await this.db.getAllAsync<GetSolveData>(getSolveByIdSql, [
-        sessionId,
-      ]);
+      const res = this.db.getAllSync<GetSolveData>(getSolveByIdSql, {
+        $session_id: sessionId,
+        $puzzle_code: puzzleCode,
+      });
 
       if (!res)
         return {
@@ -212,20 +274,23 @@ export class Database {
       const solves: SolveData[] = [];
 
       for (const solve of res) {
-        let penaltyState = solve.penalty_state;
+        const penaltyState: PenaltyState = isPenaltyState(solve.penalty_state)
+          ? solve.penalty_state
+          : "DNF";
+
         if (
-          !["noPenalty", "+2", "DNF"].includes(
-            solve.penalty_state as PenaltyState,
-          )
+          !isWCAScrambleCode(solve.puzzle_code) &&
+          !isSubsetScrambleCode(solve.puzzle_code)
         )
-          penaltyState = "DNF";
+          return { status: "error", message: "The puzzle code is invalid" };
         solves.push({
           id: solve.id,
           scramble: solve.scramble,
           date: new Date(solve.solve_date),
           solveTime: solve.solve_time,
-          penaltyState: penaltyState as PenaltyState,
+          penaltyState,
           session: solve.session_id,
+          puzzleScrambleCode: solve.puzzle_code,
         });
       }
 
@@ -254,6 +319,7 @@ export class Database {
                 , solve_date
                 , penalty_state
                 , session_id
+                , puzzle_code
             FROM solves
             WHERE
                 id = $id
@@ -268,20 +334,25 @@ export class Database {
           message: `A solve with id: ${solveId} was not found`,
         };
 
-      if (
-        !["noPenalty", "+2", "DNF"].includes(res.penalty_state as PenaltyState)
-      )
+      if (!isPenaltyState(res.penalty_state)) {
         return {
           status: "error",
           message: `Penalty state of solve is invalid, and is of value: ${res.penalty_state}`,
         };
+      }
+      if (
+        !isWCAScrambleCode(res.puzzle_code) &&
+        !isSubsetScrambleCode(res.puzzle_code)
+      )
+        return { status: "error", message: "The puzzle code is invalid" };
       const solveData: SolveData = {
         id: solveId,
         scramble: res.scramble,
         date: new Date(res.solve_date),
         solveTime: res.solve_time,
-        penaltyState: res.penalty_state as PenaltyState,
+        penaltyState: res.penalty_state,
         session: res.session_id,
+        puzzleScrambleCode: res.puzzle_code,
       };
 
       return { status: "success", solveData };
@@ -334,4 +405,5 @@ type GetSolveData = {
   solve_date: number;
   penalty_state: string;
   session_id: number;
+  puzzle_code: string;
 };

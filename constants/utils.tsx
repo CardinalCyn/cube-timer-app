@@ -1,5 +1,17 @@
-import { SolveData } from "@/types/types";
-import { DNF_VALUE, penaltySolveTime, UNKNOWN } from "./constants";
+import {
+  PenaltyState,
+  SolveData,
+  Subset3x3ScrambleCategory,
+  WCAScrambleCategory,
+} from "@/types/types";
+import {
+  DNF_VALUE,
+  penaltySolveTime,
+  penaltyStates,
+  subset3x3Data,
+  UNKNOWN,
+  WCAScrData,
+} from "./constants";
 
 export function convertCubingTime(
   elapsedTime: number,
@@ -65,4 +77,26 @@ export function parseStat(solveTime: number, key: string): string {
     : statsToTimeFormat.includes(key)
     ? convertCubingTime(solveTime, ".", true, true)
     : solveTime.toString();
+}
+
+export function isPenaltyState(value: string): value is PenaltyState {
+  return (penaltyStates as readonly string[]).includes(value);
+}
+
+export function isWCAScrambleCode(
+  value: string,
+): value is WCAScrambleCategory["scrambleCode"] {
+  for (const scrambleData of WCAScrData) {
+    if (value === scrambleData.scrambleCode) return true;
+  }
+  return false;
+}
+
+export function isSubsetScrambleCode(
+  value: string,
+): value is Subset3x3ScrambleCategory["scrambleCode"] {
+  for (const scrambleData of subset3x3Data) {
+    if (value === scrambleData.scrambleCode) return true;
+  }
+  return false;
 }

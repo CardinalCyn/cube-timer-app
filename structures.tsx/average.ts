@@ -245,21 +245,3 @@ export interface CubingNode {
   parent: CubingNode | null;
   isPersonalBest?: boolean;
 }
-
-// Example usage:
-/*
-const avgComp = new AverageComponent();
-
-// Add some solve times (in milliseconds)
-avgComp.put(1250); // 1.25 seconds
-avgComp.put(1180); // 1.18 seconds
-avgComp.put(1320); // 1.32 seconds
-avgComp.put(1100); // 1.10 seconds
-avgComp.put(1450); // 1.45 seconds
-
-console.log('Statistics:', avgComp.getStats());
-
-// Remove a time
-avgComp.remove(1450);
-console.log('After removal:', avgComp.getStats());
-*/

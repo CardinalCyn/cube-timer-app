@@ -1,5 +1,5 @@
 // app/(drawer)/timer/_layout.tsx
-import NavBar from "@/components/NavBar";
+import NavBar from "@/components/navbar/NavBar";
 import { allTabs } from "@/constants/constants";
 import { useSettings } from "@/hooks/useSettings";
 import { Tabs } from "expo-router";
@@ -10,7 +10,7 @@ export default function StandardLayout() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <NavBar pathname="asdfadfa" />
+      <NavBar />
       <Tabs
         screenOptions={{
           headerShown: false,

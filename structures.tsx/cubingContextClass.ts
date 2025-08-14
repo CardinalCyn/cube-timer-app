@@ -1,3 +1,4 @@
+import { allValidPuzzleCodes } from "@/constants/constants";
 import { Database } from "@/database/database";
 import {
   DatabaseError,
@@ -5,90 +6,85 @@ import {
   SolveData,
   StatisticsStatsData,
   TimerStats,
+  ValidPuzzleCode,
 } from "@/types/types";
 import { ChartDataPoint, Statistics } from "./statistics";
 
-//create new session
-//change session
-
 export class CubingContextClass {
   private db: Database;
-  private statistics: Statistics;
-  private sessions: number[];
-  private setCurrentSessionIndex: (currentSession: number) => void;
-  private currentSession: number;
-  private trimPercentage: number;
+  private currentTimerPuzzleType: ValidPuzzleCode;
+  private statistics: { [K in ValidPuzzleCode]: Statistics };
 
   constructor(
     currentSessionIndex: number,
     trimPercentage: number,
     currentSession: number,
-    setCurrentSessionIndex: (currentSession: number) => void,
+    currentPuzzleType: ValidPuzzleCode,
   ) {
     this.db = new Database();
-    this.statistics = new Statistics(currentSessionIndex, trimPercentage);
+    this.currentTimerPuzzleType = currentPuzzleType;
+
+    // Fix: Pass parameters in correct order
+    this.statistics = this.createStatisticsObj(
+      trimPercentage,
+      currentSessionIndex,
+    );
+
     const getSessionsData = this.db.getSessions();
-    this.setCurrentSessionIndex = setCurrentSessionIndex;
     if (getSessionsData.status === "error")
       throw { error: "There was an issue with retrieving the sessions" };
-    this.sessions = getSessionsData.sessions;
-    this.currentSession = currentSession;
-    this.trimPercentage = trimPercentage;
+
+    const sessionsObj: { [puzzle_code: string]: number[] } = {};
+    for (const session of getSessionsData.sessions) {
+      if (!sessionsObj[session.puzzle_code]) {
+        sessionsObj[session.puzzle_code] = [];
+      }
+      sessionsObj[session.puzzle_code].push(session.session_id);
+    }
+
     this.initializeStatistics();
   }
 
-  private async initializeStatistics(): Promise<void> {
-    const solves = await this.db.getAllSolves();
+  private createStatisticsObj(
+    trimPercentage: number,
+    currentSessionIndex: number,
+  ): { [K in ValidPuzzleCode]: Statistics } {
+    const validStatisticsObj: { [K in ValidPuzzleCode]: Statistics } =
+      Object.fromEntries(
+        allValidPuzzleCodes.map((code) => [
+          code,
+          new Statistics(trimPercentage, currentSessionIndex),
+        ]),
+      ) as { [K in ValidPuzzleCode]: Statistics };
+
+    return validStatisticsObj;
+  }
+
+  private initializeStatistics(): void {
+    const solves = this.db.getAllSolvesByPuzzleCode(
+      this.currentTimerPuzzleType,
+    );
     if (solves.status === "error")
       throw { error: "There was an issue with retrieving the solves" };
-    solves.solveData.forEach((solve) => this.db.removeSolve(solve.id));
-    solves.solveData.forEach((solve) => this.db.getSolveById(solve.id));
+
+    solves.solveData.forEach((solve) => {
+      this.statistics[this.currentTimerPuzzleType].addSolve(solve);
+    });
   }
 
-  createNewSession(): number {
-    this.currentSession = Math.max(...this.sessions) + 1;
-    this.sessions.push(this.currentSession);
-
-    this.resetStatistics();
-    return this.currentSession;
+  changeCurrentTimerPuzzleType(puzzleType: ValidPuzzleCode): void {
+    this.currentTimerPuzzleType = puzzleType;
+    this.initializeStatistics();
   }
 
-  //resets statistics, readds Solves
-  private async resetStatistics() {
-    this.statistics = new Statistics(this.currentSession, this.trimPercentage);
-
-    const getAllSolvesData = await this.db.getAllSolves();
-
-    if (getAllSolvesData.status === "error") return getAllSolvesData;
-
-    getAllSolvesData.solveData.forEach((solve) =>
-      this.statistics.addSolve(solve),
-    );
-  }
-
-  async changeSession(
-    sessionToSwapTo: number,
-  ): Promise<DatabaseError | DatabaseSuccess> {
-    try {
-      this.setCurrentSessionIndex(sessionToSwapTo);
-
-      return { status: "success" };
-    } catch (err) {
-      console.error(err);
-      return {
-        status: "error",
-        message: "The session was unable to be changed",
-      };
-    }
-  }
-
-  async getSolvesBySessionId(
+  getSolvesBySessionId(
     isHistorical: boolean,
     sessionId: number,
-  ): Promise<(DatabaseSuccess & { solveData: SolveData[] }) | DatabaseError> {
-    const solvesBySessionData = await this.db.getSolvesBySession(
+  ): (DatabaseSuccess & { solveData: SolveData[] }) | DatabaseError {
+    const solvesBySessionData = this.db.getSolvesBySessionPuzzleCode(
       isHistorical,
       sessionId,
+      this.currentTimerPuzzleType,
     );
     if (solvesBySessionData.status === "error") return solvesBySessionData;
 
@@ -101,7 +97,10 @@ export class CubingContextClass {
     const addSolveResult = await this.db.addSolve(solve);
     if (addSolveResult.status === "error") return addSolveResult;
 
-    this.statistics.addSolve({ ...solve, id: addSolveResult.solveId });
+    this.statistics[this.currentTimerPuzzleType].addSolve({
+      ...solve,
+      id: addSolveResult.solveId,
+    });
 
     return { status: "success" };
   }
@@ -110,32 +109,35 @@ export class CubingContextClass {
     const removeSolveResult = await this.db.removeSolve(solveId);
     if (removeSolveResult.status === "error") return removeSolveResult;
 
-    //removal of a solve is nontrivial, have to reset this.statistics
-    this.statistics.reset();
+    this.statistics[this.currentTimerPuzzleType].reset();
 
-    const getAllSolvesResult = await this.db.getAllSolves();
+    const getAllSolvesResult = await this.db.getAllSolvesByPuzzleCode(
+      this.currentTimerPuzzleType,
+    );
     if (getAllSolvesResult.status === "error") return getAllSolvesResult;
 
     getAllSolvesResult.solveData.forEach((solve) =>
-      this.statistics.addSolve(solve),
+      this.statistics[this.currentTimerPuzzleType].addSolve(solve),
     );
 
     return { status: "success" };
   }
 
   getStatsData(): StatisticsStatsData {
-    return this.statistics.getAnalyticsStatsData();
+    return this.statistics[this.currentTimerPuzzleType].getAnalyticsStatsData();
   }
 
   getGlobalChartData(): ChartDataPoint[] {
-    return this.statistics.getGlobalChartData();
+    return this.statistics[this.currentTimerPuzzleType].getGlobalChartData();
   }
 
   getCurrentSessionChartData(): ChartDataPoint[] {
-    return this.statistics.getCurrentSessionChartData();
+    return this.statistics[
+      this.currentTimerPuzzleType
+    ].getCurrentSessionChartData();
   }
 
   getTimerStats(): TimerStats {
-    return this.statistics.getTimerStatsData();
+    return this.statistics[this.currentTimerPuzzleType].getTimerStatsData();
   }
 }
