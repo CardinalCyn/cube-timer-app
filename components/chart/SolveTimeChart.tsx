@@ -2,7 +2,7 @@ import { DNF_VALUE } from "@/constants/constants";
 import { convertCubingTime } from "@/constants/utils";
 import { useCubing } from "@/hooks/useCubing";
 import { useSettings } from "@/hooks/useSettings";
-import { ChartSeries } from "@/types/types";
+import { ChartSeries, NavbarType } from "@/types/types";
 import { useFont } from "@shopify/react-native-skia";
 import React, { ReactNode } from "react";
 import { View } from "react-native";
@@ -10,18 +10,22 @@ import { CartesianChart, Line, PointsArray, Scatter } from "victory-native";
 import SolveChartLegend from "./SolveChartLegend";
 import SolveChartStats from "./SolveChartStats";
 
+type SolveTimeChartProps = {
+  chartSeries: ChartSeries[];
+  navbarType: NavbarType;
+};
+
 export default function SolveTimeChart({
   chartSeries,
-}: {
-  chartSeries: ChartSeries[];
-}) {
+  navbarType,
+}: SolveTimeChartProps) {
   const { colors } = useSettings();
   const font = useFont(require("../../assets/fonts/SpaceMono-Regular.ttf"));
 
   const { cubingContextClass } = useCubing();
 
   const chartData = cubingContextClass
-    .getGlobalChartData()
+    .getGlobalChartData(navbarType)
     .map((point, index) => {
       return {
         solveId: point.solveId,
@@ -119,7 +123,9 @@ export default function SolveTimeChart({
         )}
       </CartesianChart>
       <SolveChartLegend chartSeries={chartSeries} />
-      <SolveChartStats statisticsData={cubingContextClass.getStatsData()} />
+      <SolveChartStats
+        statisticsData={cubingContextClass.getStatsData(navbarType)}
+      />
     </View>
   );
 }

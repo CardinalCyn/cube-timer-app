@@ -1,4 +1,9 @@
-import { AllScreens, ChartSeries, ValidPuzzleCode } from "@/types/types";
+import {
+  AllScreens,
+  ChartSeries,
+  PenaltyState,
+  ValidPuzzleCode,
+} from "@/types/types";
 import { MaterialIcons } from "@expo/vector-icons";
 
 export const allScreens: AllScreens[] = [
@@ -85,6 +90,12 @@ export const trimPercentage = 5;
 
 export const penaltyStates = ["+2", "noPenalty", "DNF"] as const;
 
+export const penaltyStateTitleMap: { [key in PenaltyState]: string } = {
+  noPenalty: "No penalty",
+  "+2": "+2",
+  DNF: "DNF",
+};
+
 export const chartToolTipLabels: { label: string; textColor: string }[] = [
   { label: "Solve Number", textColor: "" },
   { label: "Solve Time", textColor: "red" },
@@ -167,3 +178,5 @@ export const allValidPuzzleCodes: ValidPuzzleCode[] = [
   ...WCAScrData.map((c) => c.scrambleCode),
   ...subset3x3Data.map((c) => c.scrambleCode),
 ];
+
+export const SCRAMBLE_DEBUG = false;

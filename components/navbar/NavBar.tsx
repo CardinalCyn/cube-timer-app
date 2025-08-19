@@ -1,5 +1,6 @@
 import { useCubing } from "@/hooks/useCubing";
 import { useSettings } from "@/hooks/useSettings";
+import { NavbarType } from "@/types/types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { useNavigation } from "@react-navigation/native";
@@ -8,10 +9,11 @@ import { Pressable, StyleSheet, View } from "react-native";
 import { TextCustomFont } from "../TextCustomFont";
 import NavBarPuzzleSelectModal from "./NavBarPuzzleSelectModal";
 
-export default function NavBar() {
+export default function NavBar({ navbarType }: { navbarType: NavbarType }) {
   const { colors } = useSettings();
   const navigation = useNavigation<DrawerNavigationProp<any>>();
-  const { currentTimerPuzzleCategory } = useCubing();
+  const { currentTimerPuzzleCategory, currentPracticePuzzleCategory } =
+    useCubing();
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleCloseModal = () => {
@@ -34,13 +36,16 @@ export default function NavBar() {
         onPress={() => setModalVisible(true)}
       >
         <TextCustomFont style={[styles.title, { color: colors.text }]}>
-          {currentTimerPuzzleCategory.title}
+          {navbarType === "timer"
+            ? currentTimerPuzzleCategory.title
+            : currentPracticePuzzleCategory.title}
         </TextCustomFont>
         <MaterialIcons name="arrow-drop-down" size={24} color={colors.text} />
       </Pressable>
       <NavBarPuzzleSelectModal
         visible={modalVisible}
         onClose={handleCloseModal}
+        navbarType={navbarType}
       />
     </View>
   );

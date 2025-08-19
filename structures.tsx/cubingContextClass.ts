@@ -3,26 +3,32 @@ import { Database } from "@/database/database";
 import {
   DatabaseError,
   DatabaseSuccess,
+  NavbarType,
+  PenaltyState,
   SolveData,
   StatisticsStatsData,
+  Subset3x3ScrambleCategory,
   TimerStats,
   ValidPuzzleCode,
+  WCAScrambleCategory,
 } from "@/types/types";
 import { ChartDataPoint, Statistics } from "./statistics";
 
 export class CubingContextClass {
   private db: Database;
   private currentTimerPuzzleType: ValidPuzzleCode;
+  private currentPracticePuzzleType: ValidPuzzleCode;
   private statistics: { [K in ValidPuzzleCode]: Statistics };
 
   constructor(
     currentSessionIndex: number,
     trimPercentage: number,
-    currentSession: number,
-    currentPuzzleType: ValidPuzzleCode,
+    currentTimerPuzzleType: ValidPuzzleCode,
+    currentPracticePuzzleType: ValidPuzzleCode,
   ) {
     this.db = new Database();
-    this.currentTimerPuzzleType = currentPuzzleType;
+    this.currentTimerPuzzleType = currentTimerPuzzleType;
+    this.currentPracticePuzzleType = currentPracticePuzzleType;
 
     // Fix: Pass parameters in correct order
     this.statistics = this.createStatisticsObj(
@@ -61,6 +67,7 @@ export class CubingContextClass {
   }
 
   private initializeStatistics(): void {
+    this.statistics[this.currentTimerPuzzleType].reset();
     const solves = this.db.getAllSolvesByPuzzleCode(
       this.currentTimerPuzzleType,
     );
@@ -70,21 +77,45 @@ export class CubingContextClass {
     solves.solveData.forEach((solve) => {
       this.statistics[this.currentTimerPuzzleType].addSolve(solve);
     });
+
+    this.statistics[this.currentPracticePuzzleType].reset();
+    const practiceSolves = this.db.getAllSolvesByPuzzleCode(
+      this.currentPracticePuzzleType,
+    );
+    if (practiceSolves.status === "error")
+      throw { error: "There was an issue with retrieving the solves" };
+
+    practiceSolves.solveData.forEach((solve) => {
+      this.statistics[this.currentPracticePuzzleType].addSolve(solve);
+    });
   }
 
-  changeCurrentTimerPuzzleType(puzzleType: ValidPuzzleCode): void {
+  changeCurrentTimerPuzzleType(
+    puzzleType: WCAScrambleCategory["scrambleCode"],
+  ): void {
     this.currentTimerPuzzleType = puzzleType;
+
+    this.initializeStatistics();
+  }
+
+  changeCurrentPracticePuzzleType(
+    puzzleType: Subset3x3ScrambleCategory["scrambleCode"],
+  ): void {
+    this.currentPracticePuzzleType = puzzleType;
     this.initializeStatistics();
   }
 
   getSolvesBySessionId(
     isHistorical: boolean,
     sessionId: number,
+    navbarType: NavbarType,
   ): (DatabaseSuccess & { solveData: SolveData[] }) | DatabaseError {
     const solvesBySessionData = this.db.getSolvesBySessionPuzzleCode(
       isHistorical,
       sessionId,
-      this.currentTimerPuzzleType,
+      navbarType === "timer"
+        ? this.currentTimerPuzzleType
+        : this.currentPracticePuzzleType,
     );
     if (solvesBySessionData.status === "error") return solvesBySessionData;
 
@@ -93,51 +124,95 @@ export class CubingContextClass {
 
   async addSolve(
     solve: Omit<SolveData, "id">,
-  ): Promise<DatabaseError | DatabaseSuccess> {
+    navbarType: NavbarType,
+  ): Promise<DatabaseError | (DatabaseSuccess & { solveId: number })> {
     const addSolveResult = await this.db.addSolve(solve);
     if (addSolveResult.status === "error") return addSolveResult;
 
-    this.statistics[this.currentTimerPuzzleType].addSolve({
+    this.statistics[
+      navbarType === "timer"
+        ? this.currentTimerPuzzleType
+        : this.currentPracticePuzzleType
+    ].addSolve({
       ...solve,
       id: addSolveResult.solveId,
     });
 
-    return { status: "success" };
+    return addSolveResult;
   }
 
-  async removeSolve(solveId: number): Promise<DatabaseSuccess | DatabaseError> {
+  changePenaltyState(
+    solveId: number,
+    penaltyState: PenaltyState,
+  ): DatabaseSuccess | DatabaseError {
+    const updatedPenaltyStateResults = this.db.updatePenaltyStateById(
+      solveId,
+      penaltyState,
+    );
+    this.initializeStatistics();
+    return updatedPenaltyStateResults;
+  }
+
+  async removeSolve(
+    solveId: number,
+    navbarType: NavbarType,
+  ): Promise<DatabaseSuccess | DatabaseError> {
     const removeSolveResult = await this.db.removeSolve(solveId);
     if (removeSolveResult.status === "error") return removeSolveResult;
 
-    this.statistics[this.currentTimerPuzzleType].reset();
+    this.statistics[
+      navbarType === "timer"
+        ? this.currentTimerPuzzleType
+        : this.currentPracticePuzzleType
+    ].reset();
 
-    const getAllSolvesResult = await this.db.getAllSolvesByPuzzleCode(
-      this.currentTimerPuzzleType,
+    const getAllSolvesResult = this.db.getAllSolvesByPuzzleCode(
+      navbarType === "timer"
+        ? this.currentTimerPuzzleType
+        : this.currentPracticePuzzleType,
     );
     if (getAllSolvesResult.status === "error") return getAllSolvesResult;
 
     getAllSolvesResult.solveData.forEach((solve) =>
-      this.statistics[this.currentTimerPuzzleType].addSolve(solve),
+      this.statistics[
+        navbarType === "timer"
+          ? this.currentTimerPuzzleType
+          : this.currentPracticePuzzleType
+      ].addSolve(solve),
     );
 
     return { status: "success" };
   }
 
-  getStatsData(): StatisticsStatsData {
-    return this.statistics[this.currentTimerPuzzleType].getAnalyticsStatsData();
-  }
-
-  getGlobalChartData(): ChartDataPoint[] {
-    return this.statistics[this.currentTimerPuzzleType].getGlobalChartData();
-  }
-
-  getCurrentSessionChartData(): ChartDataPoint[] {
+  getStatsData(navbarType: NavbarType): StatisticsStatsData {
     return this.statistics[
-      this.currentTimerPuzzleType
+      navbarType === "timer"
+        ? this.currentTimerPuzzleType
+        : this.currentPracticePuzzleType
+    ].getAnalyticsStatsData();
+  }
+
+  getGlobalChartData(navbarType: NavbarType): ChartDataPoint[] {
+    return this.statistics[
+      navbarType === "timer"
+        ? this.currentTimerPuzzleType
+        : this.currentPracticePuzzleType
+    ].getGlobalChartData();
+  }
+
+  getCurrentSessionChartData(navbarType: NavbarType): ChartDataPoint[] {
+    return this.statistics[
+      navbarType === "timer"
+        ? this.currentTimerPuzzleType
+        : this.currentPracticePuzzleType
     ].getCurrentSessionChartData();
   }
 
-  getTimerStats(): TimerStats {
-    return this.statistics[this.currentTimerPuzzleType].getTimerStatsData();
+  getTimerStats(navbarType: NavbarType): TimerStats {
+    return this.statistics[
+      navbarType === "timer"
+        ? this.currentTimerPuzzleType
+        : this.currentPracticePuzzleType
+    ].getTimerStatsData();
   }
 }

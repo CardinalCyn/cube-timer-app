@@ -1,31 +1,52 @@
-import { WCAScrData } from "@/constants/constants";
+import { subset3x3Data, WCAScrData } from "@/constants/constants";
 import { useCubing } from "@/hooks/useCubing";
 import { useSettings } from "@/hooks/useSettings";
-import { WCAScrambleCategory } from "@/types/types";
+import {
+  NavbarType,
+  Subset3x3ScrambleCategory,
+  WCAScrambleCategory,
+} from "@/types/types";
 import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { TextCustomFont } from "../TextCustomFont";
 
 type NavBarPuzzleSelectModalProps = {
   visible: boolean;
   onClose: () => void;
+  navbarType: NavbarType;
 };
 
 export default function NavBarPuzzleSelectModal({
   visible,
   onClose,
+  navbarType,
 }: NavBarPuzzleSelectModalProps) {
   const { colors } = useSettings();
   const {
     setCurrentTimerPuzzleCategory,
     currentTimerPuzzleCategory,
     cubingContextClass,
+    setCurrentPracticePuzzleCategory,
+    currentPracticePuzzleCategory,
   } = useCubing();
 
-  function handleSelection(WCAScrPoint: WCAScrambleCategory) {
-    setCurrentTimerPuzzleCategory(WCAScrPoint);
-    cubingContextClass.changeCurrentTimerPuzzleType(WCAScrPoint.scrambleCode);
+  function handleSelection(
+    scrPoint: WCAScrambleCategory | Subset3x3ScrambleCategory,
+  ) {
+    if (navbarType === "timer") {
+      setCurrentTimerPuzzleCategory(scrPoint as WCAScrambleCategory);
+      cubingContextClass.changeCurrentTimerPuzzleType(
+        (scrPoint as WCAScrambleCategory).scrambleCode,
+      );
+    } else {
+      setCurrentPracticePuzzleCategory(scrPoint as Subset3x3ScrambleCategory);
+      cubingContextClass.changeCurrentPracticePuzzleType(
+        (scrPoint as Subset3x3ScrambleCategory).scrambleCode,
+      );
+    }
     onClose();
   }
+
+  const data = navbarType === "timer" ? WCAScrData : subset3x3Data;
 
   return (
     <Modal
@@ -49,15 +70,20 @@ export default function NavBarPuzzleSelectModal({
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.puzzleList}>
-              {WCAScrData.map((WCAScrPoint, index) => {
-                const isSelected =
-                  currentTimerPuzzleCategory.scrambleCode ===
-                  WCAScrPoint.scrambleCode;
-                const isLast = index === WCAScrData.length - 1;
+              {data.map((ScrPoint, index) => {
+                const code =
+                  navbarType === "timer"
+                    ? currentTimerPuzzleCategory.scrambleCode
+                    : currentPracticePuzzleCategory.scrambleCode;
+                const isSelected = code === ScrPoint.scrambleCode;
+                const isLast =
+                  navbarType === "timer"
+                    ? WCAScrData.length - 1 === index
+                    : subset3x3Data.length - 1 === index;
 
                 return (
                   <Pressable
-                    key={WCAScrPoint.scrambleCode}
+                    key={ScrPoint.scrambleCode}
                     style={[
                       styles.puzzleItem,
                       {
@@ -70,7 +96,7 @@ export default function NavBarPuzzleSelectModal({
                           : StyleSheet.hairlineWidth,
                       },
                     ]}
-                    onPress={() => handleSelection(WCAScrPoint)}
+                    onPress={() => handleSelection(ScrPoint)}
                     android_ripple={{
                       color: colors.primary + "20",
                       borderless: false,
@@ -85,7 +111,7 @@ export default function NavBarPuzzleSelectModal({
                         },
                       ]}
                     >
-                      {WCAScrPoint.title}
+                      {ScrPoint.title}
                     </TextCustomFont>
                   </Pressable>
                 );

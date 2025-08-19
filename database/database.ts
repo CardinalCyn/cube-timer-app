@@ -259,6 +259,7 @@ export class Database {
             WHERE
               session_id ${isHistorical ? "!=" : "="} $session_id
               AND puzzle_code = $puzzle_code
+            ORDER BY solve_date DESC
         `;
       const res = this.db.getAllSync<GetSolveData>(getSolveByIdSql, {
         $session_id: sessionId,
@@ -368,10 +369,10 @@ export class Database {
     }
   }
 
-  async updatePenaltyStateById(
+  updatePenaltyStateById(
     solveId: number,
     penaltyState: PenaltyState,
-  ): Promise<DatabaseSuccess | DatabaseError> {
+  ): DatabaseSuccess | DatabaseError {
     try {
       const updatePenaltyStateByIdSql = /*sql*/ `
             UPDATE solves
@@ -379,7 +380,7 @@ export class Database {
             WHERE id = $solve_id
     `;
 
-      await this.db.runAsync(updatePenaltyStateByIdSql, {
+      this.db.runSync(updatePenaltyStateByIdSql, {
         $penalty_state: penaltyState,
         $solve_id: solveId,
       });

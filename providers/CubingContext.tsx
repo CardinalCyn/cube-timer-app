@@ -111,8 +111,8 @@ export function CubingProvider({ children }: { children: ReactNode }) {
       const newCubing = new CubingContextClass(
         currentSessionIndex,
         trimPercentage,
-        currentSessionIndex,
         currentTimerPuzzleCategory.scrambleCode,
+        currentPracticePuzzleCategory.scrambleCode,
       );
       return newCubing;
     } catch (err) {

@@ -10,7 +10,7 @@ export default function StandardLayout() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <NavBar />
+      <NavBar navbarType="timer" />
       <Tabs
         screenOptions={{
           headerShown: false,

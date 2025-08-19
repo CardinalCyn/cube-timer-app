@@ -1,4 +1,5 @@
 import { TextCustomFont } from "@/components/TextCustomFont";
+import { DNF_VALUE } from "@/constants/constants";
 import {
   calculatePenaltySolveTime,
   convertCubingTime,
@@ -12,17 +13,21 @@ import { Modal, Pressable, StyleSheet, View } from "react-native";
 type SolveDetailModalProps = {
   visible: boolean;
   onClose: () => void;
-  solveData: SolveData | null;
+  solve: SolveData | null;
+  handleDeletion: (solveId: number) => void;
+  openPenaltyStateModal: () => void;
 };
 
 export default function SolveDetailModal({
   visible,
   onClose,
-  solveData,
+  solve,
+  handleDeletion,
+  openPenaltyStateModal,
 }: SolveDetailModalProps) {
   const { colors } = useSettings();
 
-  if (!solveData) return null;
+  if (!solve) return null;
 
   const formatDate = (date: Date) => {
     return date
@@ -37,12 +42,12 @@ export default function SolveDetailModal({
       .replace(",", "");
   };
 
-  const formattedDate = formatDate(solveData.date);
+  const formattedDate = formatDate(solve.date);
   const timeDisplay =
-    solveData.penaltyState === "DNF"
+    solve.solveTime === DNF_VALUE || solve.penaltyState === "DNF"
       ? "DNF"
       : convertCubingTime(
-          calculatePenaltySolveTime(solveData),
+          calculatePenaltySolveTime(solve.solveTime, solve.penaltyState),
           ".",
           false,
           true,
@@ -67,7 +72,7 @@ export default function SolveDetailModal({
                 {timeDisplay}
               </TextCustomFont>
               <TextCustomFont style={[{ color: "red" }]}>
-                {solveData.penaltyState === "+2" && solveData.penaltyState}
+                {solve.penaltyState === "+2" && solve.penaltyState}
               </TextCustomFont>
             </View>
             <View style={styles.topRowItem}>
@@ -78,13 +83,13 @@ export default function SolveDetailModal({
           </View>
 
           {/* Scramble */}
-          {solveData.scramble && (
+          {solve.scramble && (
             <View style={styles.scrambleContainer}>
               <MaterialIcons name="cached" size={20} color={colors.text} />
               <TextCustomFont
                 style={[styles.scrambleText, { color: colors.text }]}
               >
-                {solveData.scramble}
+                {solve.scramble}
               </TextCustomFont>
             </View>
           )}
@@ -93,24 +98,17 @@ export default function SolveDetailModal({
           <View style={styles.buttonContainer}>
             <Pressable
               onPress={() => {
-                onClose();
+                handleDeletion(solve.id);
               }}
             >
               <MaterialIcons name="delete" size={20} color="white" />
             </Pressable>
             <Pressable
               onPress={() => {
-                onClose();
+                openPenaltyStateModal();
               }}
             >
               <MaterialIcons name="flag" size={20} color={colors.text} />
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                onClose();
-              }}
-            >
-              <MaterialIcons name="book" size={20} color="white" />
             </Pressable>
           </View>
         </View>

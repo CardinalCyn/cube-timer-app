@@ -1,5 +1,5 @@
-import History from "@/components/History";
+import History from "@/components/history/History";
 
 export default function StandardHistory() {
-  return <History />;
+  return <History navbarType="timer" />;
 }

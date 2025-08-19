@@ -101,6 +101,8 @@ export type StatisticsStatsData = {
   otherStats: Stat<OtherStats>;
 };
 
+export type NavbarType = "timer" | "practice";
+
 export type ColorTheme = "light" | "dark";
 
 export type AppSettings = {
