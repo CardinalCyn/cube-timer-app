@@ -2,13 +2,13 @@ import { CubingContext } from "@/providers/CubingContext";
 import { useContext } from "react";
 
 export function useCubing() {
-  const {
-    cubingContextClass,
-    currentTimerPuzzleCategory,
-    setCurrentTimerPuzzleCategory,
-    currentPracticePuzzleCategory,
-    setCurrentPracticePuzzleCategory,
-  } = useContext(CubingContext);
+  const context = useContext(CubingContext);
+
+  if (!context) {
+    throw new Error("useCubing must be used within a CubingProvider");
+  }
+
+  const { cubingContextClass, scrambleGenerator } = context;
 
   if (!cubingContextClass) {
     throw new Error(
@@ -16,11 +16,14 @@ export function useCubing() {
     );
   }
 
+  if (!scrambleGenerator) {
+    throw new Error(
+      "Scramble generator is not initialized. Make sure useCubing is used within a CubingProvider",
+    );
+  }
+
   return {
     cubingContextClass,
-    currentTimerPuzzleCategory,
-    setCurrentTimerPuzzleCategory,
-    currentPracticePuzzleCategory,
-    setCurrentPracticePuzzleCategory,
+    scrambleGenerator,
   };
 }

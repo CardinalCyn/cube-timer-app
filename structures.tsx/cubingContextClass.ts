@@ -1,4 +1,8 @@
-import { allValidPuzzleCodes } from "@/constants/constants";
+import {
+  allValidPuzzleCodes,
+  subset3x3Data,
+  WCAScrData,
+} from "@/constants/constants";
 import { Database } from "@/database/database";
 import {
   DatabaseError,
@@ -16,19 +20,14 @@ import { ChartDataPoint, Statistics } from "./statistics";
 
 export class CubingContextClass {
   private db: Database;
-  private currentTimerPuzzleType: ValidPuzzleCode;
-  private currentPracticePuzzleType: ValidPuzzleCode;
+  private currentTimerPuzzleType: WCAScrambleCategory["scrambleCode"];
+  private currentPracticePuzzleType: Subset3x3ScrambleCategory["scrambleCode"];
   private statistics: { [K in ValidPuzzleCode]: Statistics };
 
-  constructor(
-    currentSessionIndex: number,
-    trimPercentage: number,
-    currentTimerPuzzleType: ValidPuzzleCode,
-    currentPracticePuzzleType: ValidPuzzleCode,
-  ) {
+  constructor(currentSessionIndex: number, trimPercentage: number) {
     this.db = new Database();
-    this.currentTimerPuzzleType = currentTimerPuzzleType;
-    this.currentPracticePuzzleType = currentPracticePuzzleType;
+    this.currentTimerPuzzleType = WCAScrData[0].scrambleCode;
+    this.currentPracticePuzzleType = subset3x3Data[0].scrambleCode;
 
     // Fix: Pass parameters in correct order
     this.statistics = this.createStatisticsObj(
@@ -214,5 +213,12 @@ export class CubingContextClass {
         ? this.currentTimerPuzzleType
         : this.currentPracticePuzzleType
     ].getTimerStatsData();
+  }
+
+  getCurrentPuzzleTypes() {
+    return {
+      currentTimerPuzzleType: this.currentTimerPuzzleType,
+      currentPracticePuzzleType: this.currentPracticePuzzleType,
+    };
   }
 }

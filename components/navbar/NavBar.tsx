@@ -1,3 +1,4 @@
+import { subset3x3Data, WCAScrData } from "@/constants/constants";
 import { useCubing } from "@/hooks/useCubing";
 import { useSettings } from "@/hooks/useSettings";
 import { NavbarType } from "@/types/types";
@@ -12,10 +13,17 @@ import NavBarPuzzleSelectModal from "./NavBarPuzzleSelectModal";
 export default function NavBar({ navbarType }: { navbarType: NavbarType }) {
   const { colors } = useSettings();
   const navigation = useNavigation<DrawerNavigationProp<any>>();
-  const { currentTimerPuzzleCategory, currentPracticePuzzleCategory } =
-    useCubing();
+  const { cubingContextClass } = useCubing();
   const [modalVisible, setModalVisible] = useState(false);
+  const currentPuzzleTypes = cubingContextClass.getCurrentPuzzleTypes();
+  const currentPuzzleCategory =
+    navbarType === "timer"
+      ? currentPuzzleTypes.currentTimerPuzzleType
+      : currentPuzzleTypes.currentPracticePuzzleType;
 
+  const puzzleTitle = [...WCAScrData, ...subset3x3Data].find(
+    (ele) => ele.scrambleCode === currentPuzzleCategory,
+  )?.title;
   const handleCloseModal = () => {
     setModalVisible(false);
   };
@@ -36,9 +44,7 @@ export default function NavBar({ navbarType }: { navbarType: NavbarType }) {
         onPress={() => setModalVisible(true)}
       >
         <TextCustomFont style={[styles.title, { color: colors.text }]}>
-          {navbarType === "timer"
-            ? currentTimerPuzzleCategory.title
-            : currentPracticePuzzleCategory.title}
+          {puzzleTitle}
         </TextCustomFont>
         <MaterialIcons name="arrow-drop-down" size={24} color={colors.text} />
       </Pressable>

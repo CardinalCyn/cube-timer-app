@@ -1,14 +1,8 @@
 import Loading from "@/components/Loading";
-import {
-  defaultPracticePuzzleCategory,
-  defaultTimerPuzzleCategory,
-  STORAGE_KEYS,
-  subset3x3Data,
-  WCAScrData,
-} from "@/constants/constants";
+import { STORAGE_KEYS } from "@/constants/constants";
 import { useSettings } from "@/hooks/useSettings";
 import { CubingContextClass } from "@/structures.tsx/cubingContextClass";
-import { Subset3x3ScrambleCategory, WCAScrambleCategory } from "@/types/types";
+import { ScrambleGenerator } from "@/structures.tsx/scrambleGenerator";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, {
   createContext,
@@ -19,20 +13,12 @@ import React, {
 } from "react";
 type CubingContextProps = {
   cubingContextClass: CubingContextClass | null;
-  currentTimerPuzzleCategory: WCAScrambleCategory;
-  setCurrentTimerPuzzleCategory: (puzzleCategory: WCAScrambleCategory) => void;
-  currentPracticePuzzleCategory: Subset3x3ScrambleCategory;
-  setCurrentPracticePuzzleCategory: (
-    puzzleCategory: Subset3x3ScrambleCategory,
-  ) => void;
+  scrambleGenerator: ScrambleGenerator | null;
 };
 
 export const CubingContext = createContext<CubingContextProps>({
   cubingContextClass: null,
-  currentTimerPuzzleCategory: defaultTimerPuzzleCategory,
-  setCurrentTimerPuzzleCategory: () => {},
-  currentPracticePuzzleCategory: defaultPracticePuzzleCategory,
-  setCurrentPracticePuzzleCategory: () => {},
+  scrambleGenerator: null,
 });
 
 export function CubingProvider({ children }: { children: ReactNode }) {
@@ -41,11 +27,6 @@ export function CubingProvider({ children }: { children: ReactNode }) {
     null,
   );
   const [isLoading, setIsLoading] = useState(true);
-
-  const [currentTimerPuzzleCategory, setCurrentTimerPuzzleCategory] =
-    useState<WCAScrambleCategory>(defaultTimerPuzzleCategory);
-  const [currentPracticePuzzleCategory, setCurrentPracticePuzzleCategory] =
-    useState<Subset3x3ScrambleCategory>(defaultPracticePuzzleCategory);
 
   useEffect(() => {
     async function loadAppData() {
@@ -59,44 +40,10 @@ export function CubingProvider({ children }: { children: ReactNode }) {
         } else {
           setCurrentSessionIndex(0);
         }
-
-        // Load timer puzzle category
-        const savedTimerScrambleCode = await AsyncStorage.getItem(
-          STORAGE_KEYS.TIMER_CUBING_CATEGORY,
-        );
-
-        if (savedTimerScrambleCode === null) {
-          setCurrentTimerPuzzleCategory(defaultTimerPuzzleCategory);
-        } else {
-          const foundTimerCategory = WCAScrData.find(
-            (cat) => cat.scrambleCode === savedTimerScrambleCode,
-          );
-          setCurrentTimerPuzzleCategory(
-            foundTimerCategory || defaultTimerPuzzleCategory,
-          );
-        }
-
-        // Load practice puzzle category
-        const savedPracticeScrambleCode = await AsyncStorage.getItem(
-          STORAGE_KEYS.PRACTICE_CUBING_CATEGORY,
-        );
-
-        if (savedPracticeScrambleCode === null) {
-          setCurrentPracticePuzzleCategory(defaultPracticePuzzleCategory);
-        } else {
-          const foundPracticeCategory = subset3x3Data.find(
-            (cat) => cat.scrambleCode === savedPracticeScrambleCode,
-          );
-          setCurrentPracticePuzzleCategory(
-            foundPracticeCategory || defaultPracticePuzzleCategory,
-          );
-        }
       } catch (error) {
         console.error("Failed to load app data:", error);
         // Set defaults on any error
         setCurrentSessionIndex(0);
-        setCurrentTimerPuzzleCategory(defaultTimerPuzzleCategory);
-        setCurrentPracticePuzzleCategory(defaultPracticePuzzleCategory);
       } finally {
         setIsLoading(false);
       }
@@ -111,8 +58,6 @@ export function CubingProvider({ children }: { children: ReactNode }) {
       const newCubing = new CubingContextClass(
         currentSessionIndex,
         trimPercentage,
-        currentTimerPuzzleCategory.scrambleCode,
-        currentPracticePuzzleCategory.scrambleCode,
       );
       return newCubing;
     } catch (err) {
@@ -121,16 +66,23 @@ export function CubingProvider({ children }: { children: ReactNode }) {
     }
   }, [currentSessionIndex, trimPercentage]);
 
+  const scrambleGenerator = useMemo(() => {
+    try {
+      const newScrambleGen = new ScrambleGenerator();
+      return newScrambleGen;
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  }, []);
+
   if (isLoading) {
     return <Loading />; // Your app-wide loading component
   }
 
   const contextValue: CubingContextProps = {
     cubingContextClass,
-    currentTimerPuzzleCategory,
-    setCurrentTimerPuzzleCategory,
-    currentPracticePuzzleCategory,
-    setCurrentPracticePuzzleCategory,
+    scrambleGenerator,
   };
 
   return (

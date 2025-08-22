@@ -1,5 +1,3 @@
-import scramble_333 from "../scramble_lib/333";
-
 import {
   PenaltyState,
   Subset3x3ScrambleCategory,
@@ -14,6 +12,8 @@ import {
   UNKNOWN,
   WCAScrData,
 } from "./constants";
+
+import cstimer_module from "cstimer_module";
 
 export function convertCubingTime(
   elapsedTime: number,
@@ -146,12 +146,8 @@ export function generateScramble(scrambleCode: ValidPuzzleCode): string {
     //   lsll: scramble_333.getLSLLScramble(),
     // };
     // return scrambleFuncMap[scrambleCode];
-    return scramble_333.getAnyScramble(
-      0xffffffffffff,
-      0xffffffffffff,
-      0xffffffff,
-      0xffffffff,
-    );
+
+    return cstimer_module.getScramble(scrambleCode);
   } catch (err) {
     console.error(err);
     return "Issue with scramble creator";
