@@ -64,7 +64,10 @@ export class Statistics {
   }
 
   addSolve(solve: SolveData): void {
-    solve.solveTime = calculatePenaltySolveTime(solve);
+    solve.solveTime = calculatePenaltySolveTime(
+      solve.solveTime,
+      solve.penaltyState,
+    );
     const sessionNumber = solve.session;
     const isCurrentSession = this.currentSessionIndex === sessionNumber;
     for (const key in this.globalData.averages) {

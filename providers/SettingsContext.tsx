@@ -1,4 +1,4 @@
-import { DEFAULT_TRIM_PERCENTAGE } from "@/constants/constants";
+import { DEFAULT_TRIM_PERCENTAGE, STORAGE_KEYS } from "@/constants/constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, ReactNode, useEffect, useState } from "react";
 import { useColorScheme } from "react-native";
@@ -17,8 +17,6 @@ export const SettingsContext = createContext<{
   setValidTrimPercentage: () => {},
 });
 
-const THEME_STORAGE_KEY = "@app_theme";
-const TRIM_PERCENTAGE_KEY = "@app_trim_percentage";
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const systemColorScheme = useColorScheme();
   const [theme, setTheme] = useState<ColorThemes>("dark");
@@ -31,7 +29,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     const loadSavedTheme = async () => {
       try {
         const savedTheme: string | null = await AsyncStorage.getItem(
-          THEME_STORAGE_KEY,
+          STORAGE_KEYS.THEME,
         );
         if (savedTheme === "light" || savedTheme === "dark") {
           setTheme(savedTheme);
@@ -45,7 +43,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     };
     const loadTrimPercentage = async () => {
       const savedTrimPercentage: string | null = await AsyncStorage.getItem(
-        TRIM_PERCENTAGE_KEY,
+        STORAGE_KEYS.TRIM_PERCENTAGE,
       );
       if (!Number.isNaN(savedTrimPercentage))
         setTrimPercentage(Number(savedTrimPercentage));
@@ -59,7 +57,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
     try {
-      await AsyncStorage.setItem(THEME_STORAGE_KEY, newTheme);
+      await AsyncStorage.setItem(STORAGE_KEYS.THEME, newTheme);
     } catch (error) {
       console.error("Failed to save theme:", error);
     }
@@ -70,7 +68,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       trimPercentage = DEFAULT_TRIM_PERCENTAGE;
     try {
       await AsyncStorage.setItem(
-        TRIM_PERCENTAGE_KEY,
+        STORAGE_KEYS.TRIM_PERCENTAGE,
         trimPercentage.toString(),
       );
     } catch (error) {

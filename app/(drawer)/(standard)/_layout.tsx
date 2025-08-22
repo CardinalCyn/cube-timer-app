@@ -1,22 +1,25 @@
 // app/(drawer)/timer/_layout.tsx
-import NavBar from "@/components/NavBar";
+import NavBar from "@/components/navbar/NavBar";
 import { allTabs } from "@/constants/constants";
 import { useSettings } from "@/hooks/useSettings";
-import { Tabs, usePathname } from "expo-router";
+import { Tabs } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function StandardLayout() {
   const { colors } = useSettings();
-  const pathname = usePathname();
 
   return (
-    <>
-      <NavBar pathname={pathname} />
+    <SafeAreaView style={{ flex: 1 }}>
+      <NavBar navbarType="timer" />
       <Tabs
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
             backgroundColor: colors.background,
+            elevation: 0,
+            height: 50,
           },
+          sceneStyle: { backgroundColor: colors.background },
         }}
       >
         {allTabs.map((tabData) => {
@@ -29,6 +32,6 @@ export default function StandardLayout() {
           );
         })}
       </Tabs>
-    </>
+    </SafeAreaView>
   );
 }

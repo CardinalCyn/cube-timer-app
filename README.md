@@ -8,3 +8,4 @@ settings page
 dark mode
 
 npm run start to start
+npx expo start

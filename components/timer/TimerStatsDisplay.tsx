@@ -1,16 +1,19 @@
 import { parseStat } from "@/constants/utils";
+import { useCubing } from "@/hooks/useCubing";
 import { useSettings } from "@/hooks/useSettings";
-import { TimerStats } from "@/types/types";
+import { NavbarType } from "@/types/types";
 import { StyleSheet, View } from "react-native";
-import { TextCustomFont } from "./TextCustomFont";
+import { TextCustomFont } from "../TextCustomFont";
 
-export default function TimerSolveDisplay({
-  timerSolvesData,
-}: {
-  timerSolvesData: TimerStats;
-}) {
+type TimerStatsDisplayProps = {
+  navbarType: NavbarType;
+};
+export default function TimerStatsDisplay({
+  navbarType,
+}: TimerStatsDisplayProps) {
   const { colors } = useSettings();
-
+  const { cubingContextClass } = useCubing();
+  const timerSolvesData = cubingContextClass.getTimerStats(navbarType);
   const dataKeys = Object.keys(timerSolvesData);
   const leftColumnKeys = dataKeys.slice(0, Math.ceil(dataKeys.length / 2));
   const rightColumnKeys = dataKeys.slice(Math.ceil(dataKeys.length / 2));
@@ -31,7 +34,7 @@ export default function TimerSolveDisplay({
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container]}>
       {renderColumn(leftColumnKeys)}
       {renderColumn(rightColumnKeys)}
     </View>

@@ -1,5 +1,5 @@
-import Timer from "@/components/Timer";
+import Timer from "@/components/timer/Timer";
 
 export default function PracticeTimer() {
-  return <Timer />;
+  return <Timer navbarType="practice" />;
 }

@@ -1,6 +1,8 @@
 import Loading from "@/components/Loading";
+import { STORAGE_KEYS } from "@/constants/constants";
 import { useSettings } from "@/hooks/useSettings";
 import { CubingContextClass } from "@/structures.tsx/cubingContextClass";
+import { ScrambleGenerator } from "@/structures.tsx/scrambleGenerator";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, {
   createContext,
@@ -11,13 +13,13 @@ import React, {
 } from "react";
 type CubingContextProps = {
   cubingContextClass: CubingContextClass | null;
+  scrambleGenerator: ScrambleGenerator | null;
 };
 
 export const CubingContext = createContext<CubingContextProps>({
   cubingContextClass: null,
+  scrambleGenerator: null,
 });
-
-const CURRENT_SESSION_STORAGE_KEY = "@app_current_session";
 
 export function CubingProvider({ children }: { children: ReactNode }) {
   const { trimPercentage } = useSettings();
@@ -27,41 +29,52 @@ export function CubingProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const loadCurrentSession = async () => {
+    async function loadAppData() {
       try {
-        const savedCurrentSession: string | null = await AsyncStorage.getItem(
-          CURRENT_SESSION_STORAGE_KEY,
+        // Load current session data
+        const savedCurrentSession = Number(
+          await AsyncStorage.getItem(STORAGE_KEYS.CURRENT_SESSION),
         );
-
-        if (
-          savedCurrentSession !== null &&
-          !isNaN(Number(savedCurrentSession))
-        ) {
-          setCurrentSessionIndex(Number(savedCurrentSession));
+        if (!isNaN(savedCurrentSession)) {
+          setCurrentSessionIndex(savedCurrentSession);
         } else {
-          setCurrentSessionIndex(0); // Default to 0 if nothing saved
+          setCurrentSessionIndex(0);
         }
       } catch (error) {
-        console.error("Failed to load current session:", error);
-        setCurrentSessionIndex(0); // Default to 0 on error
+        console.error("Failed to load app data:", error);
+        // Set defaults on any error
+        setCurrentSessionIndex(0);
       } finally {
         setIsLoading(false);
       }
-    };
+    }
 
-    loadCurrentSession();
+    loadAppData();
   }, []);
 
   const cubingContextClass = useMemo(() => {
     if (currentSessionIndex === null) return null;
-
-    return new CubingContextClass(
-      currentSessionIndex,
-      trimPercentage,
-      currentSessionIndex,
-      setCurrentSessionIndex,
-    );
+    try {
+      const newCubing = new CubingContextClass(
+        currentSessionIndex,
+        trimPercentage,
+      );
+      return newCubing;
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
   }, [currentSessionIndex, trimPercentage]);
+
+  const scrambleGenerator = useMemo(() => {
+    try {
+      const newScrambleGen = new ScrambleGenerator();
+      return newScrambleGen;
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  }, []);
 
   if (isLoading) {
     return <Loading />; // Your app-wide loading component
@@ -69,6 +82,7 @@ export function CubingProvider({ children }: { children: ReactNode }) {
 
   const contextValue: CubingContextProps = {
     cubingContextClass,
+    scrambleGenerator,
   };
 
   return (

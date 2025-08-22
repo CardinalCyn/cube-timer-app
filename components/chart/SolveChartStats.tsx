@@ -17,9 +17,7 @@ export default function SolveChartStats({
     useState<keyof StatisticsStatsData>("improvementStats");
 
   return (
-    <View
-      style={[styles.statsContainer, { backgroundColor: colors.background }]}
-    >
+    <View style={[styles.statsContainer]}>
       {/* Tab Selector */}
       <View style={styles.buttonContainer}>
         {Object.keys(statisticsData).map((statType, index) => {
@@ -56,8 +54,7 @@ export default function SolveChartStats({
         style={[
           styles.statsBox,
           {
-            backgroundColor: colors.background,
-            borderColor: colors.border || "#E5E5E7",
+            borderColor: colors.border,
           },
         ]}
       >
@@ -164,10 +161,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
     elevation: 3,
   },
   headerRow: {

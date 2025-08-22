@@ -1,4 +1,3 @@
-import { useSettings } from "@/hooks/useSettings";
 import { ChartSeries } from "@/types/types";
 import React from "react";
 import { StyleSheet, View } from "react-native";
@@ -11,11 +10,8 @@ interface SolveChartLegendProps {
 export default function SolveChartLegend({
   chartSeries,
 }: SolveChartLegendProps) {
-  const { colors } = useSettings();
   return (
-    <View
-      style={[styles.legendContainer, { backgroundColor: colors.background }]}
-    >
+    <View style={[styles.legendContainer]}>
       {chartSeries.map((series) => (
         <View key={series.property} style={styles.legendItem}>
           <View

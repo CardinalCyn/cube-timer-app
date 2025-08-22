@@ -1,4 +1,8 @@
-import { scrData } from "@/constants/constants";
+import {
+  penaltyStates,
+  subset3x3Data,
+  WCAScrData,
+} from "@/constants/constants";
 
 export type AllScreens = {
   name: string;
@@ -19,8 +23,6 @@ export type TimerSolvesData = {
   Ao100: string | null;
 };
 
-export type PenaltyState = "noPenalty" | "+2" | "DNF";
-
 export type SolveData = {
   id: number;
   scramble: string;
@@ -28,6 +30,9 @@ export type SolveData = {
   date: Date;
   penaltyState: PenaltyState;
   session: number;
+  puzzleScrambleCode:
+    | WCAScrambleCategory["scrambleCode"]
+    | Subset3x3ScrambleCategory["scrambleCode"];
 };
 
 export type ChartData = {
@@ -96,6 +101,8 @@ export type StatisticsStatsData = {
   otherStats: Stat<OtherStats>;
 };
 
+export type NavbarType = "timer" | "practice";
+
 export type ColorTheme = "light" | "dark";
 
 export type AppSettings = {
@@ -112,4 +119,12 @@ export type DatabaseError = {
   message: string;
 };
 
-export type ScrambleCategory = keyof typeof scrData;
+export type PenaltyState = (typeof penaltyStates)[number];
+
+export type WCAScrambleCategory = (typeof WCAScrData)[number];
+
+export type Subset3x3ScrambleCategory = (typeof subset3x3Data)[number];
+
+export type ValidPuzzleCode =
+  | WCAScrambleCategory["scrambleCode"]
+  | Subset3x3ScrambleCategory["scrambleCode"];

@@ -1,5 +1,19 @@
-import { SolveData } from "@/types/types";
-import { DNF_VALUE, penaltySolveTime, UNKNOWN } from "./constants";
+import {
+  PenaltyState,
+  Subset3x3ScrambleCategory,
+  ValidPuzzleCode,
+  WCAScrambleCategory,
+} from "@/types/types";
+import {
+  DNF_VALUE,
+  penaltySolveTime,
+  penaltyStates,
+  subset3x3Data,
+  UNKNOWN,
+  WCAScrData,
+} from "./constants";
+
+import cstimer_module from "cstimer_module";
 
 export function convertCubingTime(
   elapsedTime: number,
@@ -34,12 +48,15 @@ export function convertCubingTime(
       }`;
 }
 
-export function calculatePenaltySolveTime(solve: SolveData): number {
-  return solve.penaltyState === "DNF"
+export function calculatePenaltySolveTime(
+  solveTime: number,
+  penaltyState: PenaltyState,
+): number {
+  return penaltyState === "DNF"
     ? DNF_VALUE
-    : solve.penaltyState === "+2"
-    ? solve.solveTime + penaltySolveTime
-    : solve.solveTime;
+    : penaltyState === "+2"
+    ? solveTime + penaltySolveTime
+    : solveTime;
 }
 
 const statsToTimeFormat = [
@@ -65,4 +82,74 @@ export function parseStat(solveTime: number, key: string): string {
     : statsToTimeFormat.includes(key)
     ? convertCubingTime(solveTime, ".", true, true)
     : solveTime.toString();
+}
+
+export function isPenaltyState(value: string): value is PenaltyState {
+  return (penaltyStates as readonly string[]).includes(value);
+}
+
+export function isWCAScrambleCode(
+  value: string,
+): value is WCAScrambleCategory["scrambleCode"] {
+  for (const scrambleData of WCAScrData) {
+    if (value === scrambleData.scrambleCode) return true;
+  }
+  return false;
+}
+
+export function isSubsetScrambleCode(
+  value: string,
+): value is Subset3x3ScrambleCategory["scrambleCode"] {
+  for (const scrambleData of subset3x3Data) {
+    if (value === scrambleData.scrambleCode) return true;
+  }
+  return false;
+}
+
+export function generateScramble(scrambleCode: ValidPuzzleCode): string {
+  try {
+    // const scrambleFuncMap: { [K in ValidPuzzleCode]: string } = {
+    //   "333": scramble_333.getAnyScramble(
+    //     0xffffffffffff,
+    //     0xffffffffffff,
+    //     0xffffffff,
+    //     0xffffffff,
+    //   ),
+    //   "222so": scramble_222.getScramble("222so"),
+    //   "444wca": scramble_444.getRandomScramble(),
+    //   "555wca":
+    //     megascramble.megascramble("555wca", 60) || "Issue with generating 555",
+    //   "666wca":
+    //     megascramble.megascramble("666wca", 80) || "Issue with generating 666",
+    //   "777wca":
+    //     megascramble.megascramble("666wca", 100) || "Issue with generating 777",
+    //   clkwca: clock.getScramble(),
+    //   mgmp: utilscramble.utilscramble("mgmp", 70),
+    //   pyrso: pyraminx.getScramble("pyrso"),
+    //   skbso: skewb.getScramble("skbso"),
+    //   sqrs: sq1.getRandomScramble(),
+    //   "2gen": scramble_333.subsetScramble(["U", "R"]),
+    //   "2genl": scramble_333.subsetScramble(["U", "L"]),
+    //   roux: scramble_333.subsetScramble(["M", "U"]),
+    //   "3gen_F": scramble_333.subsetScramble(["U", "R", "F"]),
+    //   "3gen_L": scramble_333.subsetScramble(["U", "R", "L"]),
+    //   RrU: scramble_333.subsetScramble(["R", "Rw", "U"]),
+    //   "333drud": scramble_333.subsetScramble([
+    //     "U",
+    //     "R2",
+    //     "F2",
+    //     "D",
+    //     "L2",
+    //     "B2",
+    //   ]),
+    //   half: scramble_333.subsetScramble(["U2", "R2", "F2", "D2", "L2", "B2"]),
+    //   lsll: scramble_333.getLSLLScramble(),
+    // };
+    // return scrambleFuncMap[scrambleCode];
+
+    return cstimer_module.getScramble(scrambleCode);
+  } catch (err) {
+    console.error(err);
+    return "Issue with scramble creator";
+  }
 }
