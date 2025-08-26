@@ -1,10 +1,10 @@
-import { calculatePenaltySolveTime } from "@/constants/utils";
+import { calculatePenaltySolveTime, generateScramble } from "@/constants/utils";
 import { useCubing } from "@/hooks/useCubing";
 import { useSettings } from "@/hooks/useSettings";
 import { NavbarType, PenaltyState, SolveData } from "@/types/types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRef, useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, View } from "react-native";
 import ErrorDisplay from "../ErrorDisplay";
 import ScrambleDisplay from "./ScrambleDisplay";
 import TimerDisplay from "./TimerDisplay";
@@ -26,7 +26,9 @@ export default function Timer({ navbarType }: TimerProps) {
       : currentPuzzleTypes.currentPracticePuzzleType;
 
   const [errorMessage, setErrorMessage] = useState("");
-  const [scramble, setScramble] = useState(generateScramble());
+  const [scramble, setScramble] = useState(
+    scrambleGenerator.getScrambleByPuzzleCode(currentPuzzleCategory),
+  );
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [lastSolve, setLastSolve] = useState<SolveData | null>(null);
@@ -38,10 +40,6 @@ export default function Timer({ navbarType }: TimerProps) {
 
   const showControls = !isRunning && (lastSolve?.id || -1) !== -1;
   const showUndoOnly = showControls && currentPenaltyState !== "noPenalty";
-
-  function generateScramble(): string {
-    return "random scramble" + Math.random();
-  }
 
   function toggleTimer() {
     if (isRunning) stopTimer();
@@ -87,7 +85,7 @@ export default function Timer({ navbarType }: TimerProps) {
       }
     }
 
-    generateScramble();
+    setScramble(generateScramble(currentPuzzleCategory));
   }
 
   async function addSolve(): Promise<number> {
@@ -182,15 +180,11 @@ export default function Timer({ navbarType }: TimerProps) {
   }
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1">
       <ErrorDisplay errorMessage={errorMessage} />
       <ScrambleDisplay scramble={scramble} />
-      <Pressable
-        style={styles.pressableContainer}
-        onPress={toggleTimer}
-        disabled={!scramble}
-      >
-        <View style={styles.timerContainer}>
+      <Pressable className="flex-1" onPress={toggleTimer} disabled={!scramble}>
+        <View className="flex-1 justify-items-center items-center">
           <TimerDisplay
             elapsedTime={elapsedTime}
             penaltyState={currentPenaltyState}
@@ -200,36 +194,36 @@ export default function Timer({ navbarType }: TimerProps) {
             <MaterialIcons
               name="undo"
               size={24}
-              color={colors.text}
+              color={colors.colors.primary}
               onPress={() => updatePenaltyState("noPenalty")}
-              style={styles.iconButton}
+              className="p-10"
             />
           ) : showControls ? (
-            <View style={styles.solveButtonContainer}>
+            <View className=" flex-row justify-items-center items-center mt-20 gap-20">
               <MaterialIcons
                 name="delete"
                 size={24}
-                color={colors.text}
+                color={colors.colors.text}
                 onPress={() => deleteSolve()}
-                style={styles.iconButton}
+                className="p-10"
               />
               <MaterialIcons
                 name="cancel"
                 size={24}
-                color={colors.text}
+                color={colors.colors.text}
                 onPress={() => updatePenaltyState("DNF")}
-                style={styles.iconButton}
+                className="p-10"
               />
               <MaterialIcons
                 name="flag"
                 size={24}
-                color={colors.text}
+                color={colors.colors.text}
                 onPress={() => updatePenaltyState("+2")}
-                style={styles.iconButton}
+                className="p-10"
               />
             </View>
           ) : (
-            <View style={styles.placeholderContainer} />
+            <View></View>
           )}
         </View>
       </Pressable>
@@ -237,31 +231,3 @@ export default function Timer({ navbarType }: TimerProps) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  pressableContainer: {
-    flex: 1,
-  },
-  timerContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  solveButtonContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 20,
-    gap: 20,
-  },
-  iconButton: {
-    padding: 10,
-  },
-  placeholderContainer: {
-    height: 44, // Same height as button container
-    marginTop: 20,
-  },
-});

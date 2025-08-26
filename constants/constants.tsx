@@ -1,8 +1,11 @@
 import {
   AllScreens,
   ChartSeries,
+  ColorTheme,
   PenaltyState,
+  Subset3x3ScrambleCategory,
   ValidPuzzleCode,
+  WCAScrambleCategory,
 } from "@/types/types";
 import { MaterialIcons } from "@expo/vector-icons";
 
@@ -51,38 +54,8 @@ export const allTabs = [
   },
 ];
 
-export const themes: {
-  [key: string]: {
-    background: string;
-    text: string;
-    primary: string;
-    secondary: string;
-    border: string;
-    card: string;
-  };
-} = {
-  light: {
-    background: "#FFFFFF",
-    text: "#000000",
-    primary: "#007AFF",
-    secondary: "#5856D6",
-    border: "#E5E5EA",
-    card: "#F2F2F7",
-  },
-  dark: {
-    background: "#000000",
-    text: "#FFFFFF",
-    primary: "#0A84FF",
-    secondary: "#5E5CE6",
-    border: "#38383A",
-    card: "#1C1C1E",
-  },
-};
-
 export const DNF_VALUE = Number.MAX_SAFE_INTEGER;
 export const UNKNOWN = -666;
-
-export const DEFAULT_TRIM_PERCENTAGE = 5;
 
 //how much time is added with a +2
 export const penaltySolveTime = 2000;
@@ -163,8 +136,25 @@ export const subset3x3Data = [
   },
 ] as const;
 
-export const defaultTimerPuzzleCategory = WCAScrData[0];
-export const defaultPracticePuzzleCategory = subset3x3Data[0];
+export const DEFAULT_SETTINGS: {
+  THEME: ColorTheme;
+  TRIM_PERCENTAGE: number;
+  DEFAULT_TIMER_PUZZLE_CATEGORY: WCAScrambleCategory;
+  DEFAULT_PRACTICE_PUZZLE_CATEGORY: Subset3x3ScrambleCategory;
+  INSPECTION_ENABLED: boolean;
+  INSPECTION_TIME: number;
+  DISPLAY_STATS: boolean;
+  DISPLAY_TIME_DURING_SOLVE: boolean;
+} = {
+  THEME: "dark",
+  TRIM_PERCENTAGE: 5,
+  DEFAULT_TIMER_PUZZLE_CATEGORY: WCAScrData[0],
+  DEFAULT_PRACTICE_PUZZLE_CATEGORY: subset3x3Data[0],
+  INSPECTION_ENABLED: false,
+  INSPECTION_TIME: 15,
+  DISPLAY_STATS: true,
+  DISPLAY_TIME_DURING_SOLVE: true,
+};
 
 export const STORAGE_KEYS = {
   CURRENT_SESSION: "@app_current_session",
@@ -172,6 +162,10 @@ export const STORAGE_KEYS = {
   TRIM_PERCENTAGE: "@app_trim_percentage",
   TIMER_CUBING_CATEGORY: "@app_timer_cubing_category",
   PRACTICE_CUBING_CATEGORY: "@app_practice_cubing_category",
+  INSPECTION_ENABLED: "@app_inspection_enabled",
+  INSPECTION_TIME: "@app_inspection_time",
+  DISPLAY_STATS: "@app_display_stats",
+  DISPLAY_TIME_DURING_SOLVE: "@app_display_time_during_solve",
 };
 
 export const allValidPuzzleCodes: ValidPuzzleCode[] = [

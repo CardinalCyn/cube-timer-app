@@ -1,7 +1,7 @@
 import { ChartSeries } from "@/types/types";
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { TextCustomFont } from "../TextCustomFont";
+import { Text } from "../ui/text";
 
 interface SolveChartLegendProps {
   chartSeries: ChartSeries[];
@@ -17,9 +17,7 @@ export default function SolveChartLegend({
           <View
             style={[styles.legendDot, { backgroundColor: series.color }]}
           ></View>
-          <TextCustomFont style={[styles.legendText]}>
-            {series.title}
-          </TextCustomFont>
+          <Text style={[styles.legendText]}>{series.title}</Text>
         </View>
       ))}
     </View>

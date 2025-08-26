@@ -1,4 +1,4 @@
-import { TextCustomFont } from "@/components/TextCustomFont";
+import { Text } from "@/components/ui/text";
 import { Link, Stack } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
@@ -7,11 +7,9 @@ export default function NotFoundScreen() {
     <>
       <Stack.Screen options={{ title: "Oops!" }} />
       <View style={styles.container}>
-        <TextCustomFont style={styles.title}>
-          This screen does not exist.
-        </TextCustomFont>
+        <Text style={styles.title}>This screen does not exist.</Text>
         <Link href="/(drawer)/(standard)/index" style={styles.link}>
-          <TextCustomFont>Go to home screen!</TextCustomFont>
+          <Text>Go to home screen!</Text>
         </Link>
       </View>
     </>

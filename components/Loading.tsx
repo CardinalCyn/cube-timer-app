@@ -1,10 +1,10 @@
 import { View } from "react-native";
-import { TextCustomFont } from "./TextCustomFont";
+import { Text } from "./ui/text";
 
 export default function Loading() {
   return (
     <View>
-      <TextCustomFont>Loading currently</TextCustomFont>
+      <Text>Loading currently</Text>
     </View>
   );
 }

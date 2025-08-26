@@ -95,21 +95,25 @@ export default function SolveTimeChart({
         domain={{ x: [0, xMax], y: [0, yMax] }}
         xAxis={{
           font,
-          labelColor: colors.text,
-          lineColor: colors.text,
+          labelColor: colors.colors.text,
+          lineColor: colors.colors.text,
         }}
         yAxis={[
           {
             font,
-            labelColor: colors.text,
-            lineColor: colors.text,
+            labelColor: colors.colors.text,
+            lineColor: colors.colors.text,
             formatYLabel: (val) => {
               if (val === undefined || val === null) return "";
               return convertCubingTime(val, ":", false, false);
             },
           },
         ]}
-        axisOptions={{ font, labelColor: colors.text, lineColor: "white" }}
+        axisOptions={{
+          font,
+          labelColor: colors.colors.text,
+          lineColor: "white",
+        }}
       >
         {({ points }) => (
           <View>

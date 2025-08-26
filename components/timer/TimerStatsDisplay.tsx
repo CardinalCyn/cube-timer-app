@@ -3,7 +3,7 @@ import { useCubing } from "@/hooks/useCubing";
 import { useSettings } from "@/hooks/useSettings";
 import { NavbarType } from "@/types/types";
 import { StyleSheet, View } from "react-native";
-import { TextCustomFont } from "../TextCustomFont";
+import { Text } from "../ui/text";
 
 type TimerStatsDisplayProps = {
   navbarType: NavbarType;
@@ -21,14 +21,14 @@ export default function TimerStatsDisplay({
   const renderColumn = (keys: string[]) => (
     <View>
       {keys.map((key) => (
-        <TextCustomFont key={key} style={[styles.text, { color: colors.text }]}>
+        <Text key={key} style={[styles.text, { color: colors.colors.text }]}>
           {timerSolvesData[key as keyof typeof timerSolvesData].title +
             ": " +
             parseStat(
               timerSolvesData[key as keyof typeof timerSolvesData].value,
               key,
             )}
-        </TextCustomFont>
+        </Text>
       ))}
     </View>
   );

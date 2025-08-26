@@ -13,8 +13,6 @@ import {
   WCAScrData,
 } from "./constants";
 
-import cstimer_module from "cstimer_module";
-
 export function convertCubingTime(
   elapsedTime: number,
   millisecondsFormat: "." | ":",
@@ -147,7 +145,9 @@ export function generateScramble(scrambleCode: ValidPuzzleCode): string {
     // };
     // return scrambleFuncMap[scrambleCode];
 
-    return cstimer_module.getScramble(scrambleCode);
+    // return cstimer_module.getScramble(scrambleCode);
+
+    return "random scramble" + Math.random();
   } catch (err) {
     console.error(err);
     return "Issue with scramble creator";

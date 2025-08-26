@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { TextCustomFont } from "../TextCustomFont";
+import { Text } from "../ui/text";
 
 type ScrambleDisplayProps = {
   scramble: string;
@@ -7,7 +7,7 @@ type ScrambleDisplayProps = {
 export default function ScrambleDisplay({ scramble }: ScrambleDisplayProps) {
   return (
     <View>
-      <TextCustomFont>{scramble}</TextCustomFont>
+      <Text>{scramble}</Text>
     </View>
   );
 }

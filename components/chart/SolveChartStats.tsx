@@ -3,7 +3,7 @@ import { useSettings } from "@/hooks/useSettings";
 import { StatisticsStatsData, StatVal } from "@/types/types";
 import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import { TextCustomFont } from "../TextCustomFont";
+import { Text } from "../ui/text";
 
 type SolveChartStatsProps = {
   statisticsData: StatisticsStatsData;
@@ -33,7 +33,9 @@ export default function SolveChartStats({
               style={[
                 styles.pressable,
                 {
-                  backgroundColor: isSelected ? colors.card : colors.background,
+                  backgroundColor: isSelected
+                    ? colors.colors.card
+                    : colors.colors.background,
                   borderTopLeftRadius: isFirst ? 8 : 0,
                   borderBottomLeftRadius: isFirst ? 8 : 0,
                   borderTopRightRadius: isLast ? 8 : 0,
@@ -41,9 +43,9 @@ export default function SolveChartStats({
                 },
               ]}
             >
-              <TextCustomFont style={[styles.tabText, { color: colors.text }]}>
+              <Text style={[styles.tabText, { color: colors.colors.text }]}>
                 {statisticsData[key].header}
-              </TextCustomFont>
+              </Text>
             </Pressable>
           );
         })}
@@ -54,26 +56,26 @@ export default function SolveChartStats({
         style={[
           styles.statsBox,
           {
-            borderColor: colors.border,
+            borderColor: colors.colors.border,
           },
         ]}
       >
         {/* Headers */}
         <View style={styles.headerRow}>
           <View style={[styles.statsCol, styles.labelCol]}>
-            <TextCustomFont style={[styles.headerText, { color: colors.text }]}>
+            <Text style={[styles.headerText, { color: colors.colors.text }]}>
               Statistic
-            </TextCustomFont>
+            </Text>
           </View>
           <View style={[styles.statsCol, styles.dataCol]}>
-            <TextCustomFont style={[styles.headerText, { color: colors.text }]}>
+            <Text style={[styles.headerText, { color: colors.colors.text }]}>
               Global
-            </TextCustomFont>
+            </Text>
           </View>
           <View style={[styles.statsCol, styles.dataCol]}>
-            <TextCustomFont style={[styles.headerText, { color: colors.text }]}>
+            <Text style={[styles.headerText, { color: colors.colors.text }]}>
               Session
-            </TextCustomFont>
+            </Text>
           </View>
         </View>
 
@@ -94,33 +96,37 @@ export default function SolveChartStats({
                   key={key}
                   style={[
                     styles.dataRow,
-                    { backgroundColor: isEven ? "transparent" : colors.card },
+                    {
+                      backgroundColor: isEven
+                        ? "transparent"
+                        : colors.colors.card,
+                    },
                   ]}
                 >
                   <View style={[styles.statsCol, styles.labelCol]}>
-                    <TextCustomFont
-                      style={[styles.labelText, { color: colors.text }]}
+                    <Text
+                      style={[styles.labelText, { color: colors.colors.text }]}
                     >
                       {key}
-                    </TextCustomFont>
+                    </Text>
                   </View>
                   <View style={[styles.statsCol, styles.dataCol]}>
-                    <TextCustomFont
-                      style={[styles.dataText, { color: colors.text }]}
+                    <Text
+                      style={[styles.dataText, { color: colors.colors.text }]}
                     >
                       {parseStat(global[key as keyof typeof global].value, key)}
-                    </TextCustomFont>
+                    </Text>
                   </View>
                   <View style={[styles.statsCol, styles.dataCol]}>
-                    <TextCustomFont
-                      style={[styles.dataText, { color: colors.text }]}
+                    <Text
+                      style={[styles.dataText, { color: colors.colors.text }]}
                     >
                       {parseStat(
                         currentSession[key as keyof typeof currentSession]
                           .value,
                         key,
                       )}
-                    </TextCustomFont>
+                    </Text>
                   </View>
                 </View>
               );

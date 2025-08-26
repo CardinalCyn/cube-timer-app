@@ -1,4 +1,3 @@
-// app/(drawer)/timer/_layout.tsx
 import NavBar from "@/components/navbar/NavBar";
 import { allTabs } from "@/constants/constants";
 import { useSettings } from "@/hooks/useSettings";
@@ -7,19 +6,33 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PracticeLayout() {
   const { colors } = useSettings();
-
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <NavBar navbarType="practice" />
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.colors.background }}
+    >
+      <NavBar navbarType="timer" />
       <Tabs
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: colors.background,
+            backgroundColor: "transparent",
             elevation: 0,
-            height: 50,
+            shadowOpacity: 0,
+            shadowOffset: { width: 0, height: 0 },
+            shadowRadius: 0,
+            borderTopWidth: 0,
+            borderTopColor: "transparent",
           },
-          sceneStyle: { backgroundColor: colors.background },
+          tabBarActiveTintColor: "#007AFF", // Active tab color
+          tabBarInactiveTintColor: "#8E8E93", // Inactive tab color
+          tabBarShowLabel: true, // Show/hide labels
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight: "500",
+          },
+          tabBarIconStyle: {
+            marginBottom: -3, // Adjust icon position
+          },
         }}
       >
         {allTabs.map((tabData) => {

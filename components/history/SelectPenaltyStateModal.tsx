@@ -3,7 +3,7 @@ import { useSettings } from "@/hooks/useSettings";
 import { PenaltyState } from "@/types/types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Modal, Pressable, StyleSheet, View } from "react-native";
-import { TextCustomFont } from "../TextCustomFont";
+import { Text } from "../ui/text";
 
 type SelectPenaltyStateModalProps = {
   solveId: number;
@@ -29,13 +29,22 @@ export default function SelectPenaltyStateModal({
       onRequestClose={onClose}
     >
       <Pressable style={styles.overlay} onPress={onClose}>
-        <View style={[styles.modalContainer, { backgroundColor: colors.card }]}>
+        <View
+          style={[
+            styles.modalContainer,
+            { backgroundColor: colors.colors.card },
+          ]}
+        >
           <View style={styles.header}>
-            <TextCustomFont style={[styles.title, { color: colors.text }]}>
+            <Text style={[styles.title, { color: colors.colors.text }]}>
               Select Penalty
-            </TextCustomFont>
+            </Text>
             <Pressable onPress={onClose} style={styles.closeButton}>
-              <MaterialIcons name="close" size={24} color={colors.text} />
+              <MaterialIcons
+                name="close"
+                size={24}
+                color={colors.colors.text}
+              />
             </Pressable>
           </View>
 
@@ -45,20 +54,20 @@ export default function SelectPenaltyStateModal({
                 key={penaltyState}
                 style={[
                   styles.optionButton,
-                  { borderColor: colors.text + "20" },
+                  { borderColor: colors.colors.text + "20" },
                 ]}
                 onPress={() => handleSelectPenaltyState(solveId, penaltyState)}
               >
                 <View style={styles.optionContent}>
                   <View style={styles.optionText}>
-                    <TextCustomFont
+                    <Text
                       style={[
                         styles.penaltyDescription,
-                        { color: colors.text },
+                        { color: colors.colors.text },
                       ]}
                     >
                       {penaltyStateTitleMap[penaltyState]}
-                    </TextCustomFont>
+                    </Text>
                   </View>
                 </View>
               </Pressable>

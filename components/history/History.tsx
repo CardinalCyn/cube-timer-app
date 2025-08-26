@@ -1,39 +1,30 @@
-import SolveDetailModal from "@/components/history/SolveDetailModal";
-import { TextCustomFont } from "@/components/TextCustomFont";
-import { DNF_VALUE } from "@/constants/constants";
-import {
-  calculatePenaltySolveTime,
-  convertCubingTime,
-} from "@/constants/utils";
 import { useCubing } from "@/hooks/useCubing";
-import { useSettings } from "@/hooks/useSettings";
 import { NavbarType, PenaltyState, SolveData } from "@/types/types";
-import React, { useState } from "react";
-import { FlatList, Pressable, StyleSheet, View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
+import React, { useEffect, useState } from "react";
+import { View } from "react-native";
 import ErrorDisplay from "../ErrorDisplay";
 import SelectPenaltyStateModal from "./SelectPenaltyStateModal";
+import SolveDetailDialog from "./SolveDetailDialog";
 
 type HistoryProps = { navbarType: NavbarType };
 export default function History({ navbarType }: HistoryProps) {
-  const { colors } = useSettings();
+  const numColumns = 3;
   const [selectedSolve, setSelectedSolve] = useState<SolveData | null>(null);
   const [solveDetailModalVisible, setSolveDetailModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [solveData, setSolveData] = useState<SolveData[]>([]); // Store in state
   const [
     isSelectPenaltyStateModalVisible,
     setIsSelectPenaltyStateModalVisible,
   ] = useState(false);
 
-  const numColumns = 3;
-  let solveData: (SolveData | null)[] = [];
-
   const { cubingContextClass } = useCubing();
-  refreshSolveData();
 
-  function handleSolvePress(solve: SolveData) {
-    setSelectedSolve(solve);
-    setSolveDetailModalVisible(true);
-  }
+  // Use useEffect to load data on mount and when navbarType changes
+  useEffect(() => {
+    refreshSolveData();
+  }, [navbarType, cubingContextClass]);
 
   function handleCloseModal() {
     setSolveDetailModalVisible(false);
@@ -50,7 +41,7 @@ export default function History({ navbarType }: HistoryProps) {
       setErrorMessage(removeSolveData.message);
     else setErrorMessage("");
     handleCloseModal();
-    refreshSolveData();
+    refreshSolveData(); // Refresh after deletion
   }
 
   function refreshSolveData() {
@@ -61,13 +52,14 @@ export default function History({ navbarType }: HistoryProps) {
     );
     if (getSolvesBySessionIdResult.status === "error") {
       setErrorMessage(getSolvesBySessionIdResult.message);
+      setSolveData([]); // Clear data on error
     } else {
-      solveData = getSolvesBySessionIdResult.solveData;
-      while (solveData.length % numColumns) solveData.push(null);
+      setSolveData(getSolvesBySessionIdResult.solveData); // Update state
     }
   }
 
-  function openPenaltyStateModal() {
+  function openPenaltyStateModal(solve: SolveData) {
+    setSelectedSolve(solve); // Set the selected solve
     setIsSelectPenaltyStateModalVisible(true);
   }
 
@@ -84,70 +76,30 @@ export default function History({ navbarType }: HistoryProps) {
     else setErrorMessage("");
     setIsSelectPenaltyStateModalVisible(false);
     setSolveDetailModalVisible(false);
+    refreshSolveData(); // Refresh after penalty change
   }
 
-  const renderSolveItem = ({ item: solve }: { item: SolveData | null }) => {
-    if (solve === null) {
-      return <View style={styles.pressableContainer} />;
-    }
-
-    return (
-      <Pressable
-        style={[styles.pressableContainer, { backgroundColor: colors.card }]}
-        onPress={() => handleSolvePress(solve)}
-      >
-        <TextCustomFont style={[styles.solveTime, { color: colors.text }]}>
-          {solve.solveTime === DNF_VALUE || solve.penaltyState === "DNF"
-            ? "DNF"
-            : convertCubingTime(
-                calculatePenaltySolveTime(solve.solveTime, solve.penaltyState),
-                ".",
-                false,
-                true,
-              )}
-        </TextCustomFont>
-        {solve.date && (
-          <TextCustomFont style={[styles.date, { color: colors.text }]}>
-            {new Date(solve.date).toLocaleDateString()}
-          </TextCustomFont>
-        )}
-      </Pressable>
-    );
-  };
-
-  const renderEmptyState = () => (
-    <View style={styles.emptyContainer}>
-      <TextCustomFont style={[styles.emptyText, { color: colors.text }]}>
-        No solves yet. Start timing to see your history!
-      </TextCustomFont>
+  const renderSolveItem = ({ item }: { item: SolveData }) => (
+    <View className={`flex-${numColumns} mx-1 mb-2`}>
+      <SolveDetailDialog
+        solve={item}
+        handleDeletion={handleDeletion}
+        openPenaltyStateModal={() => openPenaltyStateModal(item)}
+      />
     </View>
   );
 
   return (
-    <View style={[styles.container]}>
-      {errorMessage ? (
-        <ErrorDisplay errorMessage={errorMessage} />
-      ) : (
-        <FlatList
-          data={solveData}
-          renderItem={renderSolveItem}
-          numColumns={numColumns}
-          contentContainerStyle={[
-            styles.listContainer,
-            solveData.length === 0 && styles.emptyListContainer,
-          ]}
-          columnWrapperStyle={solveData.length > 0 ? styles.row : undefined}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={renderEmptyState}
-        />
-      )}
+    <View className="flex-1">
+      <ErrorDisplay errorMessage={errorMessage} />
 
-      <SolveDetailModal
-        visible={solveDetailModalVisible}
-        onClose={handleCloseModal}
-        solve={selectedSolve}
-        handleDeletion={handleDeletion}
-        openPenaltyStateModal={openPenaltyStateModal}
+      <FlashList
+        data={solveData}
+        renderItem={renderSolveItem}
+        keyExtractor={(item) => item.id.toString()}
+        numColumns={numColumns}
+        contentContainerStyle={{}}
+        showsVerticalScrollIndicator={false}
       />
 
       {isSelectPenaltyStateModalVisible && selectedSolve && (
@@ -160,57 +112,3 @@ export default function History({ navbarType }: HistoryProps) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  centerContent: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  listContainer: {
-    paddingBottom: 20,
-  },
-  emptyListContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  row: {
-    justifyContent: "space-between",
-    marginBottom: 16,
-  },
-  pressableContainer: {
-    flex: 1,
-    borderRadius: 12,
-    elevation: 3,
-    minHeight: 150,
-    justifyContent: "center",
-    marginLeft: 8,
-    marginRight: 8,
-  },
-  solveTime: {
-    fontSize: 24,
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  date: {
-    fontSize: 14,
-    textAlign: "center",
-    opacity: 0.5,
-  },
-  emptyContainer: {
-    padding: 32,
-    alignItems: "center",
-  },
-  emptyText: {
-    fontSize: 16,
-    textAlign: "center",
-    opacity: 0.7,
-  },
-  loadingText: {
-    fontSize: 16,
-  },
-});

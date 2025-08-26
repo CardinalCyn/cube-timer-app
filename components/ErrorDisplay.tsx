@@ -1,6 +1,5 @@
 import { View } from "react-native";
-import { TextCustomFont } from "./TextCustomFont";
-
+import { Text } from "./ui/text";
 type ErrorDisplayProps = {
   errorMessage: string;
 };
@@ -8,7 +7,7 @@ type ErrorDisplayProps = {
 export default function ErrorDisplay({ errorMessage }: ErrorDisplayProps) {
   return (
     <View>
-      <TextCustomFont>{errorMessage}</TextCustomFont>
+      <Text>{errorMessage}</Text>
     </View>
   );
 }
