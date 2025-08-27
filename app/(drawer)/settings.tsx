@@ -29,7 +29,7 @@ export default function Settings() {
     disabled: boolean;
   } & (
     | { toggleType: "switch"; val: boolean; func: () => void }
-    | { toggleType: "slider"; val: number; func: (value: number) => void }
+    | { toggleType: "textInput"; val: number; func: (value: number) => void }
   );
 
   const settings: {
@@ -60,7 +60,7 @@ export default function Settings() {
         },
         {
           title: "Inspection time",
-          toggleType: "slider",
+          toggleType: "textInput",
           val: inspectionTime,
           func: (inspectionTime: number) =>
             setValidInspectionTime(inspectionTime),
@@ -85,7 +85,7 @@ export default function Settings() {
       rows: [
         {
           title: "Trim percentage",
-          toggleType: "slider",
+          toggleType: "textInput",
           val: trimPercentage,
           func: (trimPercentage: number) =>
             setValidTrimPercentage(trimPercentage),
