@@ -1,9 +1,7 @@
 {
   "main": "expo-router/entry",
   "dependencies": {
-    "@radix-ui/react-switch": "^1.2.6",
     "@react-native-async-storage/async-storage": "2.1.2",
-    "@react-native-community/slider": "4.5.6",
     "@react-native-reusables/cli": "^0.5.0",
     "@react-navigation/drawer": "^7.3.9",
     "@rn-primitives/dialog": "^1.2.0",
@@ -13,7 +11,6 @@
     "@rn-primitives/select": "^1.2.0",
     "@rn-primitives/separator": "^1.2.0",
     "@rn-primitives/slot": "^1.2.0",
-    "@rn-primitives/switch": "^1.2.0",
     "@shopify/flash-list": "^2.0.3",
     "@shopify/react-native-skia": "2.0.0-next.4",
     "class-variance-authority": "^0.7.1",
