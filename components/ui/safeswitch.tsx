@@ -21,7 +21,6 @@ export function SafeSwitch({
   className,
   disabled,
 }: SafeSwitchProps) {
-  // shared value that animates whenever `checked` changes
   const progress = useSharedValue(checked ? 1 : 0);
 
   useEffect(() => {

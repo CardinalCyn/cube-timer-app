@@ -3,6 +3,7 @@
   "dependencies": {
     "@radix-ui/react-switch": "^1.2.6",
     "@react-native-async-storage/async-storage": "2.1.2",
+    "@react-native-community/slider": "4.5.6",
     "@react-native-reusables/cli": "^0.5.0",
     "@react-navigation/drawer": "^7.3.9",
     "@rn-primitives/dialog": "^1.2.0",

@@ -1,3 +1,4 @@
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SafeSwitch } from "@/components/ui/safeswitch";
 import { Separator } from "@/components/ui/separator";
@@ -20,6 +21,7 @@ export default function Settings() {
     toggleDisplayStats,
     displayTimeDuringSolve,
     toggleDisplayTimeDuringSolve,
+    colors,
   } = useSettings();
 
   type Row = {
@@ -132,7 +134,11 @@ export default function Settings() {
                           disabled={row.disabled}
                         />
                       ) : (
-                        <></>
+                        <Input
+                          keyboardType="numeric"
+                          value={row.val.toString()}
+                          onChangeText={(text) => row.func(Number(text))}
+                        />
                       )}
                     </View>
                   </View>

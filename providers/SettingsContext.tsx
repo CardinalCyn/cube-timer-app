@@ -158,6 +158,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   const setValidTrimPercentage = async (newTrimPercentage: number) => {
     try {
+      console.log(newTrimPercentage);
       if (newTrimPercentage < 0 || newTrimPercentage > 30)
         newTrimPercentage = DEFAULT_SETTINGS.TRIM_PERCENTAGE;
       setTrimPercentage(newTrimPercentage);
