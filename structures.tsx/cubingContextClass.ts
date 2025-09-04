@@ -29,7 +29,6 @@ export class CubingContextClass {
     this.currentTimerPuzzleType = WCAScrData[0].scrambleCode;
     this.currentPracticePuzzleType = subset3x3Data[0].scrambleCode;
 
-    // Fix: Pass parameters in correct order
     this.statistics = this.createStatisticsObj(
       trimPercentage,
       currentSessionIndex,
@@ -107,14 +106,12 @@ export class CubingContextClass {
   getSolvesBySessionId(
     isHistorical: boolean,
     sessionId: number,
-    navbarType: NavbarType,
+    puzzleCategory: ValidPuzzleCode,
   ): (DatabaseSuccess & { solveData: SolveData[] }) | DatabaseError {
     const solvesBySessionData = this.db.getSolvesBySessionPuzzleCode(
       isHistorical,
       sessionId,
-      navbarType === "timer"
-        ? this.currentTimerPuzzleType
-        : this.currentPracticePuzzleType,
+      puzzleCategory,
     );
     if (solvesBySessionData.status === "error") return solvesBySessionData;
 
@@ -123,16 +120,12 @@ export class CubingContextClass {
 
   async addSolve(
     solve: Omit<SolveData, "id">,
-    navbarType: NavbarType,
+    puzzleCategory: ValidPuzzleCode,
   ): Promise<DatabaseError | (DatabaseSuccess & { solveId: number })> {
     const addSolveResult = await this.db.addSolve(solve);
     if (addSolveResult.status === "error") return addSolveResult;
 
-    this.statistics[
-      navbarType === "timer"
-        ? this.currentTimerPuzzleType
-        : this.currentPracticePuzzleType
-    ].addSolve({
+    this.statistics[puzzleCategory].addSolve({
       ...solve,
       id: addSolveResult.solveId,
     });
@@ -154,30 +147,42 @@ export class CubingContextClass {
 
   async removeSolve(
     solveId: number,
-    navbarType: NavbarType,
+    currentPuzzleCategory: ValidPuzzleCode,
   ): Promise<DatabaseSuccess | DatabaseError> {
     const removeSolveResult = await this.db.removeSolve(solveId);
     if (removeSolveResult.status === "error") return removeSolveResult;
 
-    this.statistics[
-      navbarType === "timer"
-        ? this.currentTimerPuzzleType
-        : this.currentPracticePuzzleType
-    ].reset();
+    this.statistics[currentPuzzleCategory].reset();
 
     const getAllSolvesResult = this.db.getAllSolvesByPuzzleCode(
-      navbarType === "timer"
-        ? this.currentTimerPuzzleType
-        : this.currentPracticePuzzleType,
+      currentPuzzleCategory,
     );
     if (getAllSolvesResult.status === "error") return getAllSolvesResult;
 
     getAllSolvesResult.solveData.forEach((solve) =>
-      this.statistics[
-        navbarType === "timer"
-          ? this.currentTimerPuzzleType
-          : this.currentPracticePuzzleType
-      ].addSolve(solve),
+      this.statistics[currentPuzzleCategory].addSolve(solve),
+    );
+
+    return { status: "success" };
+  }
+
+  async removeSolves(
+    sessionId: number,
+    puzzleCode: ValidPuzzleCode,
+  ): Promise<DatabaseSuccess | DatabaseError> {
+    const removeSolveResult = await this.db.removeSolvesBySessionPuzzleCode(
+      sessionId,
+      puzzleCode,
+    );
+    if (removeSolveResult.status === "error") return removeSolveResult;
+
+    this.statistics[puzzleCode].reset();
+
+    const getAllSolvesResult = this.db.getAllSolvesByPuzzleCode(puzzleCode);
+    if (getAllSolvesResult.status === "error") return getAllSolvesResult;
+
+    getAllSolvesResult.solveData.forEach((solve) =>
+      this.statistics[puzzleCode].addSolve(solve),
     );
 
     return { status: "success" };

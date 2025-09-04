@@ -177,6 +177,35 @@ export class Database {
     }
   }
 
+  async removeSolvesBySessionPuzzleCode(
+    sessionId: number,
+    puzzleCode: ValidPuzzleCode,
+  ): Promise<DatabaseSuccess | DatabaseError> {
+    try {
+      const sql = /*sql*/ `
+      DELETE FROM solves
+      WHERE session_id = $session_id
+      AND puzzle_code = $puzzle_code
+    `;
+
+      await this.db.runAsync(sql, {
+        $session_id: sessionId,
+        $puzzle_code: puzzleCode,
+      });
+
+      return { status: "success" };
+    } catch (err) {
+      console.error(err);
+      return {
+        status: "error",
+        message:
+          err instanceof Error
+            ? err.message
+            : `There was an error with removing solves of session: ${sessionId} and puzzleCode: ${puzzleCode}`,
+      };
+    }
+  }
+
   getAllSolvesByPuzzleCode(
     puzzleCode: ValidPuzzleCode,
   ): (DatabaseSuccess & { solveData: SolveData[] }) | DatabaseError {
@@ -192,6 +221,7 @@ export class Database {
                 , puzzle_code
             FROM solves
             WHERE puzzle_code = $puzzle_code
+            ORDER BY solve_date ASC
         `;
       const res = this.db.getAllSync<GetSolveData>(getSolveByIdSql, {
         $puzzle_code: puzzleCode,

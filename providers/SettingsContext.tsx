@@ -58,7 +58,12 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     async function loadSettings() {
       try {
         const results = await AsyncStorage.multiGet([
-          STORAGE_KEYS.CURRENT_SESSION,
+          STORAGE_KEYS.THEME,
+          STORAGE_KEYS.DISPLAY_STATS,
+          STORAGE_KEYS.INSPECTION_ENABLED,
+          STORAGE_KEYS.INSPECTION_TIME,
+          STORAGE_KEYS.TRIM_PERCENTAGE,
+          STORAGE_KEYS.DISPLAY_TIME_DURING_SOLVE,
         ]);
         const settings = Object.fromEntries(results);
         const savedTheme = settings[STORAGE_KEYS.THEME];
@@ -158,7 +163,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   const setValidTrimPercentage = async (newTrimPercentage: number) => {
     try {
-      console.log(newTrimPercentage);
       if (newTrimPercentage < 0 || newTrimPercentage > 30)
         newTrimPercentage = DEFAULT_SETTINGS.TRIM_PERCENTAGE;
       setTrimPercentage(newTrimPercentage);

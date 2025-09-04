@@ -55,7 +55,16 @@ export const THEME = {
   },
 };
 
-export const NAV_THEME: Record<"light" | "dark", Theme> = {
+type ExtendedTheme = Omit<Theme, "colors"> & {
+  colors: Theme["colors"] & {
+    chart1: string;
+    chart2: string;
+    chart3: string;
+    chart4: string;
+  };
+};
+
+export const NAV_THEME: Record<"light" | "dark", ExtendedTheme> = {
   light: {
     ...DefaultTheme,
     colors: {
@@ -65,6 +74,10 @@ export const NAV_THEME: Record<"light" | "dark", Theme> = {
       notification: THEME.light.destructive,
       primary: THEME.light.primary,
       text: THEME.light.foreground,
+      chart1: THEME.light.chart1,
+      chart2: THEME.light.chart2,
+      chart3: THEME.light.chart3,
+      chart4: THEME.light.chart4,
     },
   },
   dark: {
@@ -76,6 +89,10 @@ export const NAV_THEME: Record<"light" | "dark", Theme> = {
       notification: THEME.dark.destructive,
       primary: THEME.dark.primary,
       text: THEME.dark.foreground,
+      chart1: THEME.dark.chart1,
+      chart2: THEME.dark.chart2,
+      chart3: THEME.dark.chart3,
+      chart4: THEME.dark.chart4,
     },
   },
 };

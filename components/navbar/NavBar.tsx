@@ -10,7 +10,8 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { useNavigation } from "@react-navigation/native";
-import { Pressable, View } from "react-native";
+import { Platform, Pressable, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   Select,
   SelectContent,
@@ -44,6 +45,18 @@ export default function NavBar({ navbarType }: { navbarType: NavbarType }) {
           puzzleCode as Subset3x3ScrambleCategory["scrambleCode"],
         );
   }
+
+  const insets = useSafeAreaInsets();
+  const contentInsets = {
+    top: insets.top,
+    bottom: Platform.select({
+      ios: insets.bottom,
+      android: insets.bottom + 24,
+    }),
+    left: 12,
+    right: 12,
+  };
+
   return (
     <View className="flex-row items-center justify-between px-16 py-12 elevation-md">
       <View className="flex-1 items-start">
@@ -57,7 +70,7 @@ export default function NavBar({ navbarType }: { navbarType: NavbarType }) {
         <SelectTrigger>
           <SelectValue placeholder={puzzleTitle} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent insets={contentInsets}>
           <SelectGroup>
             {(navbarType === "timer" ? WCAScrData : subset3x3Data).map(
               (scrPoint) => (
@@ -66,7 +79,9 @@ export default function NavBar({ navbarType }: { navbarType: NavbarType }) {
                   label={scrPoint.title}
                   value={scrPoint.scrambleCode}
                   onPress={() => selectOnPress(scrPoint.scrambleCode)}
-                ></SelectItem>
+                >
+                  {scrPoint.title}
+                </SelectItem>
               ),
             )}
           </SelectGroup>

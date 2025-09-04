@@ -1,41 +1,78 @@
 import { DNF_VALUE } from "@/constants/constants";
-import { convertCubingTime } from "@/constants/utils";
+import { convertCubingTime, hslToHex } from "@/constants/utils";
 import { useCubing } from "@/hooks/useCubing";
 import { useSettings } from "@/hooks/useSettings";
+import { ChartDataPoint } from "@/structures.tsx/statistics";
 import { ChartSeries, NavbarType } from "@/types/types";
 import { useFont } from "@shopify/react-native-skia";
-import React, { ReactNode } from "react";
+import { useFocusEffect } from "expo-router";
+import React, { ReactNode, useCallback, useState } from "react";
 import { View } from "react-native";
 import { CartesianChart, Line, PointsArray, Scatter } from "victory-native";
 import SolveChartLegend from "./SolveChartLegend";
 import SolveChartStats from "./SolveChartStats";
 
 type SolveTimeChartProps = {
-  chartSeries: ChartSeries[];
   navbarType: NavbarType;
 };
 
-export default function SolveTimeChart({
-  chartSeries,
-  navbarType,
-}: SolveTimeChartProps) {
-  const { colors } = useSettings();
-  const font = useFont(require("../../assets/fonts/SpaceMono-Regular.ttf"));
+export default function SolveTimeChart({ navbarType }: SolveTimeChartProps) {
+  let { colors } = useSettings();
 
+  const chartSeries: ChartSeries[] = [
+    {
+      title: "Time",
+      property: "time",
+      color: hslToHex(colors.colors.chart1),
+      connectMissingData: true,
+      graphDisplay: "line",
+    },
+    {
+      title: "Ao5",
+      property: "ao5",
+      color: hslToHex(colors.colors.chart2),
+      connectMissingData: true,
+      graphDisplay: "line",
+    },
+    {
+      title: "Ao12",
+      property: "ao12",
+      color: hslToHex(colors.colors.chart3),
+      connectMissingData: true,
+      graphDisplay: "line",
+    },
+    {
+      title: "Personal Best",
+      property: "personalBest",
+      color: hslToHex(colors.colors.chart4),
+      connectMissingData: true,
+      graphDisplay: "both",
+    },
+  ];
+  const font = useFont(require("../../assets/fonts/SpaceMono-Regular.ttf"));
+  const [chartData, setChartData] = useState<
+    (ChartDataPoint & { index: number })[]
+  >([]);
   const { cubingContextClass } = useCubing();
 
-  const chartData = cubingContextClass
-    .getGlobalChartData(navbarType)
-    .map((point, index) => {
-      return {
-        solveId: point.solveId,
-        time: point.solveTime,
-        ao5: point.ao5,
-        ao12: point.ao12,
-        index,
-        personalBest: point.personalBest,
-      };
-    });
+  useFocusEffect(
+    useCallback(() => {
+      const val = cubingContextClass
+        .getGlobalChartData(navbarType)
+        .map((point, index) => {
+          return {
+            solveId: point.solveId,
+            solveTime: point.solveTime,
+            ao5: point.ao5,
+            ao12: point.ao12,
+            index,
+            personalBest: point.personalBest,
+          };
+        });
+
+      setChartData(val);
+    }, [navbarType, cubingContextClass]),
+  );
 
   for (let i = 0; i < chartData.length; i++) {
     const point = chartData[i];
@@ -49,12 +86,13 @@ export default function SolveTimeChart({
   }
 
   const xMax = chartData.length;
-  const yMax = Math.max(...chartData.map((point) => point.time || 0));
+  const yMax = Math.max(...chartData.map((point) => point.solveTime || 0));
 
   function renderSeries(
     pointsArray: PointsArray,
     series: ChartSeries,
   ): ReactNode {
+    if (!pointsArray) return null;
     if (series.graphDisplay === "line") {
       return pointsArray.length > 1 ? (
         <Line
@@ -87,33 +125,28 @@ export default function SolveTimeChart({
     );
   }
   return (
-    <View style={{ height: 600 }}>
+    <View style={{ height: 800 }}>
       <CartesianChart
         data={chartData}
         xKey={"index"}
-        yKeys={["time", "ao5", "ao12", "personalBest"]}
+        yKeys={["solveTime", "ao5", "ao12", "personalBest"]}
         domain={{ x: [0, xMax], y: [0, yMax] }}
         xAxis={{
           font,
-          labelColor: colors.colors.text,
-          lineColor: colors.colors.text,
+          labelColor: hslToHex(colors.colors.text),
+          lineColor: hslToHex(colors.colors.text),
         }}
         yAxis={[
           {
             font,
-            labelColor: colors.colors.text,
-            lineColor: colors.colors.text,
+            labelColor: hslToHex(colors.colors.text),
+            lineColor: hslToHex(colors.colors.text),
             formatYLabel: (val) => {
               if (val === undefined || val === null) return "";
               return convertCubingTime(val, ":", false, false);
             },
           },
         ]}
-        axisOptions={{
-          font,
-          labelColor: colors.colors.text,
-          lineColor: "white",
-        }}
       >
         {({ points }) => (
           <View>

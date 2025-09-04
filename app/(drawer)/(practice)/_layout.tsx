@@ -14,6 +14,7 @@ export default function PracticeLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
+          sceneStyle: { backgroundColor: colors.colors.background },
           tabBarStyle: {
             backgroundColor: "transparent",
             elevation: 0,

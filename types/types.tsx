@@ -128,3 +128,6 @@ export type Subset3x3ScrambleCategory = (typeof subset3x3Data)[number];
 export type ValidPuzzleCode =
   | WCAScrambleCategory["scrambleCode"]
   | Subset3x3ScrambleCategory["scrambleCode"];
+
+export type SortField = "time" | "date";
+export type SortDirection = "asc" | "desc";

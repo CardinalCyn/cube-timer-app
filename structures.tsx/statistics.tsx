@@ -50,8 +50,8 @@ export class Statistics {
     this.currentSessionData = {
       averages: {
         ao3: new AverageCalculator(3, 0),
-        ao5: new AverageCalculator(5, 1),
-        ao12: new AverageCalculator(12, 1),
+        ao5: new AverageCalculator(5, 5),
+        ao12: new AverageCalculator(12, 5),
         ao50: new AverageCalculator(50, trimPercentage),
         ao100: new AverageCalculator(100, trimPercentage),
         ao1000: new AverageCalculator(1000, trimPercentage),
@@ -194,15 +194,15 @@ export class Statistics {
           best: { title: "Best", value: this.globalData.bestTime },
           ao12: {
             title: "Ao12",
-            value: this.globalData.averages.ao12.getCurrentAverage(),
+            value: this.globalData.averages.ao12.getBestAverage(),
           },
           ao50: {
             title: "Ao50",
-            value: this.globalData.averages.ao50.getCurrentAverage(),
+            value: this.globalData.averages.ao50.getBestAverage(),
           },
           ao100: {
             title: "Ao100",
-            value: this.globalData.averages.ao100.getCurrentAverage(),
+            value: this.globalData.averages.ao100.getBestAverage(),
           },
           deviation: {
             title: "Deviation",
@@ -217,15 +217,15 @@ export class Statistics {
           best: { title: "Best", value: this.currentSessionData.bestTime },
           ao12: {
             title: "Ao12",
-            value: this.currentSessionData.averages.ao12.getCurrentAverage(),
+            value: this.currentSessionData.averages.ao12.getBestAverage(),
           },
           ao50: {
             title: "Ao50",
-            value: this.currentSessionData.averages.ao50.getCurrentAverage(),
+            value: this.currentSessionData.averages.ao50.getBestAverage(),
           },
           ao100: {
             title: "Ao100",
-            value: this.currentSessionData.averages.ao100.getCurrentAverage(),
+            value: this.currentSessionData.averages.ao100.getBestAverage(),
           },
           deviation: {
             title: "Deviation",

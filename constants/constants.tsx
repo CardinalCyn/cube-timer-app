@@ -1,6 +1,5 @@
 import {
   AllScreens,
-  ChartSeries,
   ColorTheme,
   PenaltyState,
   Subset3x3ScrambleCategory,
@@ -75,37 +74,6 @@ export const chartToolTipLabels: { label: string; textColor: string }[] = [
   { label: "PB", textColor: "yellow" },
 ];
 
-export const chartSeries: ChartSeries[] = [
-  {
-    title: "Time",
-    property: "time",
-    color: "white",
-    connectMissingData: true,
-    graphDisplay: "line",
-  },
-  {
-    title: "Ao5",
-    property: "ao5",
-    color: "red",
-    connectMissingData: true,
-    graphDisplay: "line",
-  },
-  {
-    title: "Ao12",
-    property: "ao12",
-    color: "green",
-    connectMissingData: true,
-    graphDisplay: "line",
-  },
-  {
-    title: "Personal Best",
-    property: "personalBest",
-    color: "yellow",
-    connectMissingData: true,
-    graphDisplay: "both",
-  },
-];
-
 export const WCAScrData = [
   { title: "3x3x3", scrambleCode: "333", lengthModifier: 0 },
   { title: "2x2x2", scrambleCode: "222so", lengthModifier: 0 },
@@ -151,7 +119,7 @@ export const DEFAULT_SETTINGS: {
   DEFAULT_TIMER_PUZZLE_CATEGORY: WCAScrData[0],
   DEFAULT_PRACTICE_PUZZLE_CATEGORY: subset3x3Data[0],
   INSPECTION_ENABLED: false,
-  INSPECTION_TIME: 15,
+  INSPECTION_TIME: 15000,
   DISPLAY_STATS: true,
   DISPLAY_TIME_DURING_SOLVE: true,
 };

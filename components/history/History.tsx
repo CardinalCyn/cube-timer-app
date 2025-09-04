@@ -1,9 +1,17 @@
 import { useCubing } from "@/hooks/useCubing";
-import { NavbarType, PenaltyState, SolveData } from "@/types/types";
+import {
+  NavbarType,
+  PenaltyState,
+  SolveData,
+  SortDirection,
+  SortField,
+} from "@/types/types";
 import { FlashList } from "@shopify/flash-list";
-import React, { useEffect, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
 import ErrorDisplay from "../ErrorDisplay";
+import HistoryToolBar from "./HistoryToolBar";
 import SelectPenaltyStateModal from "./SelectPenaltyStateModal";
 import SolveDetailDialog from "./SolveDetailDialog";
 
@@ -11,7 +19,6 @@ type HistoryProps = { navbarType: NavbarType };
 export default function History({ navbarType }: HistoryProps) {
   const numColumns = 3;
   const [selectedSolve, setSelectedSolve] = useState<SolveData | null>(null);
-  const [solveDetailModalVisible, setSolveDetailModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [solveData, setSolveData] = useState<SolveData[]>([]); // Store in state
   const [
@@ -20,14 +27,30 @@ export default function History({ navbarType }: HistoryProps) {
   ] = useState(false);
 
   const { cubingContextClass } = useCubing();
+  const [sortField, setSortField] = useState<SortField>("date");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
-  // Use useEffect to load data on mount and when navbarType changes
-  useEffect(() => {
-    refreshSolveData();
-  }, [navbarType, cubingContextClass]);
+  function onSortChange(
+    newSortField: SortField,
+    newSortDirection: SortDirection,
+  ) {
+    setSortField(newSortField);
+    setSortDirection(newSortDirection);
+  }
+
+  const currentPuzzleTypes = cubingContextClass.getCurrentPuzzleTypes();
+  const currentPuzzleCategory =
+    navbarType === "timer"
+      ? currentPuzzleTypes.currentTimerPuzzleType
+      : currentPuzzleTypes.currentPracticePuzzleType;
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshSolveData();
+    }, [navbarType, cubingContextClass]),
+  );
 
   function handleCloseModal() {
-    setSolveDetailModalVisible(false);
     setSelectedSolve(null);
     setIsSelectPenaltyStateModalVisible(false);
   }
@@ -35,7 +58,7 @@ export default function History({ navbarType }: HistoryProps) {
   async function handleDeletion(solveId: number) {
     const removeSolveData = await cubingContextClass.removeSolve(
       solveId,
-      navbarType,
+      currentPuzzleCategory,
     );
     if (removeSolveData.status === "error")
       setErrorMessage(removeSolveData.message);
@@ -48,18 +71,18 @@ export default function History({ navbarType }: HistoryProps) {
     const getSolvesBySessionIdResult = cubingContextClass.getSolvesBySessionId(
       false,
       0,
-      navbarType,
+      currentPuzzleCategory,
     );
     if (getSolvesBySessionIdResult.status === "error") {
       setErrorMessage(getSolvesBySessionIdResult.message);
-      setSolveData([]); // Clear data on error
+      setSolveData([]);
     } else {
       setSolveData(getSolvesBySessionIdResult.solveData); // Update state
     }
   }
 
   function openPenaltyStateModal(solve: SolveData) {
-    setSelectedSolve(solve); // Set the selected solve
+    setSelectedSolve(solve);
     setIsSelectPenaltyStateModalVisible(true);
   }
 
@@ -75,7 +98,6 @@ export default function History({ navbarType }: HistoryProps) {
       setErrorMessage(changePenaltyStateData.message);
     else setErrorMessage("");
     setIsSelectPenaltyStateModalVisible(false);
-    setSolveDetailModalVisible(false);
     refreshSolveData(); // Refresh after penalty change
   }
 
@@ -89,12 +111,57 @@ export default function History({ navbarType }: HistoryProps) {
     </View>
   );
 
+  const sortedSolveData = useMemo(() => {
+    return [...solveData].sort((a, b) => {
+      let comparison = 0;
+
+      if (sortField === "time") {
+        // Handle DNF values specially
+        if (a.penaltyState === "DNF" && b.penaltyState === "DNF") {
+          // Both DNF - sort by date as secondary criteria
+          comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
+        } else if (a.penaltyState === "DNF") {
+          comparison = 1; // DNF goes to end
+        } else if (b.penaltyState === "DNF") {
+          comparison = -1; // DNF goes to end
+        } else {
+          // Both are valid times
+          comparison = a.solveTime - b.solveTime;
+        }
+      } else if (sortField === "date") {
+        comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
+      }
+
+      // Apply sort direction (but DNFs always go to end for time sorting)
+      if (
+        sortField === "time" &&
+        (a.penaltyState === "DNF" || b.penaltyState === "DNF")
+      ) {
+        return comparison; // Don't reverse DNF ordering
+      }
+
+      return sortDirection === "desc" ? -comparison : comparison;
+    });
+  }, [solveData, sortField, sortDirection]);
+
+  function onDeleteSolves() {
+    cubingContextClass.removeSolves(0, currentPuzzleCategory);
+    setSolveData([]);
+  }
+
   return (
     <View className="flex-1">
+      <HistoryToolBar
+        currentPuzzleCategory={currentPuzzleCategory}
+        onSortChange={onSortChange}
+        sortDirection={sortDirection}
+        sortField={sortField}
+        onDeleteSolves={onDeleteSolves}
+        totalSolves={solveData.length}
+      />
       <ErrorDisplay errorMessage={errorMessage} />
-
       <FlashList
-        data={solveData}
+        data={sortedSolveData}
         renderItem={renderSolveItem}
         keyExtractor={(item) => item.id.toString()}
         numColumns={numColumns}
