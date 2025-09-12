@@ -22,7 +22,7 @@ export default function SolveTimeChart({ navbarType }: SolveTimeChartProps) {
   const chartSeries: ChartSeries[] = [
     {
       title: "Time",
-      property: "time",
+      property: "solveTime",
       color: hslToHex(colors.colors.chart1),
       connectMissingData: true,
       graphDisplay: "line",
@@ -125,7 +125,7 @@ export default function SolveTimeChart({ navbarType }: SolveTimeChartProps) {
     );
   }
   return (
-    <View style={{ height: 800 }}>
+    <View style={{ height: 600 }}>
       <CartesianChart
         data={chartData}
         xKey={"index"}

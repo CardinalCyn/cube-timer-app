@@ -79,7 +79,7 @@ export function parseStat(solveTime: number, key: string): string {
     ? "--"
     : statsToTimeFormat.includes(key)
     ? convertCubingTime(solveTime, ".", true, true)
-    : solveTime.toString();
+    : solveTime.toFixed(2).toString();
 }
 
 export function isPenaltyState(value: string): value is PenaltyState {

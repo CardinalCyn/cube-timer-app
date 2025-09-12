@@ -69,6 +69,7 @@ export default function useTimer({ currentPuzzleCategory }: UseTimerProps) {
           return addSolveResults.solveId;
         }
       } catch (error) {
+        console.error(error);
         setErrorMessage("Failed to add solve");
         return -1;
       }

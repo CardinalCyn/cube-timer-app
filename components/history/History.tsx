@@ -68,16 +68,26 @@ export default function History({ navbarType }: HistoryProps) {
   }
 
   function refreshSolveData() {
-    const getSolvesBySessionIdResult = cubingContextClass.getSolvesBySessionId(
-      false,
-      0,
-      currentPuzzleCategory,
-    );
-    if (getSolvesBySessionIdResult.status === "error") {
-      setErrorMessage(getSolvesBySessionIdResult.message);
-      setSolveData([]);
-    } else {
-      setSolveData(getSolvesBySessionIdResult.solveData); // Update state
+    try {
+      const getSolvesBySessionIdResult =
+        cubingContextClass.getSolvesBySessionId(
+          false,
+          0,
+          currentPuzzleCategory,
+        );
+      if (getSolvesBySessionIdResult.status === "error") {
+        setErrorMessage(getSolvesBySessionIdResult.message);
+        setSolveData([]);
+      } else {
+        setSolveData(getSolvesBySessionIdResult.solveData); // Update state
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMessage(
+        err instanceof Error
+          ? err.message
+          : "There was an issue with retrieving the solve data",
+      );
     }
   }
 

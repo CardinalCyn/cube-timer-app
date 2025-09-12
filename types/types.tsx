@@ -1,5 +1,6 @@
 import {
   penaltyStates,
+  statKeys,
   subset3x3Data,
   WCAScrData,
 } from "@/constants/constants";
@@ -37,7 +38,7 @@ export type SolveData = {
 
 export type ChartData = {
   solveId?: number;
-  time?: number;
+  solveTime?: number;
   ao5?: number | null;
   index: number;
   ao12?: number | null;
@@ -95,10 +96,17 @@ export type TimerStats = {
   ao100: StatVal;
 };
 
+export type StatKey = (typeof statKeys)[number];
+
+// Create a mapping for the stat types
+type StatTypeMap = {
+  improvementStats: ImprovementStats;
+  averageStats: AverageStats;
+  otherStats: OtherStats;
+};
+
 export type StatisticsStatsData = {
-  improvementStats: Stat<ImprovementStats>;
-  averageStats: Stat<AverageStats>;
-  otherStats: Stat<OtherStats>;
+  [K in StatKey]: Stat<StatTypeMap[K]>;
 };
 
 export type NavbarType = "timer" | "practice";

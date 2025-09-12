@@ -111,7 +111,8 @@ export class Database {
   async addSolve(
     solveData: Omit<SolveData, "id">,
   ): Promise<(DatabaseSuccess & { solveId: number }) | DatabaseError> {
-    const addSolveSql = /*sql*/ `
+    try {
+      const addSolveSql = /*sql*/ `
         INSERT INTO solves (
             scramble
             , solve_time
@@ -129,10 +130,7 @@ export class Database {
             , $puzzle_code
         )
     `;
-
-    const statement = await this.db.prepareAsync(addSolveSql);
-    try {
-      const result = await statement.executeAsync({
+      const result = await this.db.runAsync(addSolveSql, {
         $scramble: solveData.scramble,
         $solve_time: solveData.solveTime,
         $solve_date: solveData.date.getTime(),
@@ -140,6 +138,7 @@ export class Database {
         $session_id: solveData.session,
         $puzzle_code: solveData.puzzleScrambleCode,
       });
+
       return { status: "success", solveId: result.lastInsertRowId };
     } catch (err: unknown) {
       console.error(err);
@@ -150,8 +149,6 @@ export class Database {
             ? err.message
             : "There was an issue with adding the solve",
       };
-    } finally {
-      await statement.finalizeAsync();
     }
   }
 

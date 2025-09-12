@@ -5,7 +5,6 @@ import { Separator } from "@/components/ui/separator";
 import { Text } from "@/components/ui/text";
 import { useSettings } from "@/hooks/useSettings";
 import { View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Settings() {
   const {
@@ -21,7 +20,6 @@ export default function Settings() {
     toggleDisplayStats,
     displayTimeDuringSolve,
     toggleDisplayTimeDuringSolve,
-    colors,
   } = useSettings();
 
   type Row = {
@@ -103,7 +101,7 @@ export default function Settings() {
   ];
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <View className="flex-1 bg-background">
       <View className="px-6 py-4 border-b border-border/10">
         <Text className="text-2xl font-semibold text-foreground text-center">
           Settings
@@ -152,6 +150,6 @@ export default function Settings() {
           </View>
         ))}
       </View>
-    </SafeAreaView>
+    </View>
   );
 }

@@ -142,3 +142,9 @@ export const allValidPuzzleCodes: ValidPuzzleCode[] = [
 ];
 
 export const SCRAMBLE_DEBUG = false;
+
+export const statKeys = [
+  "improvementStats",
+  "averageStats",
+  "otherStats",
+] as const;

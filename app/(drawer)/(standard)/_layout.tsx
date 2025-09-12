@@ -2,14 +2,12 @@ import NavBar from "@/components/navbar/NavBar";
 import { allTabs } from "@/constants/constants";
 import { useSettings } from "@/hooks/useSettings";
 import { Tabs } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View } from "react-native";
 
 export default function StandardLayout() {
   const { colors } = useSettings();
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: colors.colors.background }}
-    >
+    <View style={{ flex: 1, backgroundColor: colors.colors.background }}>
       <NavBar navbarType="timer" />
       <Tabs
         screenOptions={{
@@ -46,6 +44,6 @@ export default function StandardLayout() {
           );
         })}
       </Tabs>
-    </SafeAreaView>
+    </View>
   );
 }
